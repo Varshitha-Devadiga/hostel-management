@@ -1,0 +1,68 @@
+/* static/css/student/login.css */
+
+/* Use the same brown primary palette defined in theme.css */
+/* Header for student login */
+.student-header,
+header.student-header {
+    background-color: var(--primary);
+    color: var(--on-primary);
+    padding: 1rem 0;
+}
+
+/* Override default header class used in the template */
+header.bcwd-header.student-header {
+    background-color: var(--primary);
+    color: var(--on-primary);
+}
+
+/* Form controls – give a warm background and bronze accent on focus */
+.student-login .form-control {
+    background-color: var(--surface-container-low);
+    border: 1px solid var(--outline-variant);
+    border-radius: var(--rounded, 0.5rem);
+    padding: 0.75rem 1rem;
+}
+.student-login .form-control:focus {
+    border-color: var(--gold-accent);
+    box-shadow: 0 0 0 0.2rem rgba(217, 176, 88, 0.25); /* gold accent */
+}
+
+/* Primary button – solid brown */
+.student-login .btn-primary {
+    background-color: var(--primary) !important;
+    border-color: var(--primary) !important;
+    color: var(--on-primary) !important;
+}
+.student-login .btn-primary:hover {
+    background-color: var(--primary-container) !important;
+    border-color: var(--primary-container) !important;
+}
+
+/* Outline button – brown border, white text on hover */
+.student-login .btn-outline-primary {
+    color: var(--primary) !important;
+    border-color: var(--primary) !important;
+}
+.student-login .btn-outline-primary:hover {
+    background-color: var(--primary);
+    color: var(--on-primary) !important;
+}
+
+/* Card container – keep glass effect, but add a subtle brown border */
+.student-login .glass-card {
+    border: 1px solid var(--outline-variant);
+    box-shadow: 0 8px 30px rgba(93, 64, 55, 0.12);
+}
+
+/* Info box – use surface container low with brown outline */
+.student-login .info-box {
+    background: var(--surface-container-low);
+    border: 1px solid var(--outline-variant);
+    border-radius: var(--rounded, 0.5rem);
+    padding: 1rem;
+}
+
+/* Ensure the main container gets the student-login class for scoping */
+.student-login main {
+    /* No extra rules needed now – placeholder for future tweaks */
+}

@@ -1,0 +1,122 @@
+{% extends "admin/admin_base.html" %}
+
+{% block title %}Marks Card Verification | BCWD{% endblock %}
+{% block page_title %}Marks Card Verification{% endblock %}
+
+{% block content %}
+<!-- KPI Bento Grid: Metrics -->
+<div class="grid-cols-3" style="margin-bottom: 2rem;">
+    <div class="glass-panel" style="padding: 1.5rem; border-left: 4px solid var(--primary);">
+        <p style="font-size: 0.85rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase;">Total Pending</p>
+        <h4 style="font-size: 2rem; font-weight: 700; color: var(--primary); margin-top: 0.5rem; margin-bottom: 0.5rem;">{{ total_pending }}</h4>
+    </div>
+    <div class="glass-panel" style="padding: 1.5rem; border-left: 4px solid var(--success);">
+        <p style="font-size: 0.85rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase;">Total Verified</p>
+        <h4 style="font-size: 2rem; font-weight: 700; color: var(--success); margin-top: 0.5rem; margin-bottom: 0.5rem;">{{ total_verified }}</h4>
+    </div>
+</div>
+
+<h3 style="font-size: 1.2rem; color: var(--primary); font-weight: 700; border-bottom: 2px solid var(--border-color); padding-bottom: 0.5rem;">Student Document Submissions</h3>
+{% if grouped_students %}
+<div style="display: flex; flex-direction: column; gap: 1rem; margin-top: 1.5rem;">
+    {% for item in grouped_students %}
+    {% set student = item.student %}
+    {% set cards = item.cards %}
+    {% set pending_count = cards | selectattr('status', 'equalto', 'Pending') | list | length %}
+    
+    <div class="glass-panel" style="padding: 1.5rem; display: flex; flex-direction: column; gap: 1rem;">
+        <div style="display: flex; justify-content: space-between; align-items: center; cursor: pointer;" onclick="toggleDetails('student-{{ student.id }}')">
+            <div style="display: flex; align-items: center; gap: 1rem;">
+                <div style="width: 48px; height: 48px; border-radius: 50%; background: var(--primary-light); color: var(--accent); display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 1.25rem;">
+                    {{ student.full_name[0] }}
+                </div>
+                <div>
+                    <h4 style="font-size: 1.1rem; font-weight: 700; color: var(--primary); margin: 0;">{{ student.full_name }}</h4>
+                    <p style="font-size: 0.85rem; font-weight: 600; color: var(--text-muted); margin: 0;">{{ student.course }}</p>
+                </div>
+            </div>
+            <div style="display: flex; align-items: center; gap: 1rem;">
+                {% if pending_count > 0 %}
+                <span class="badge badge-warning" style="font-size: 0.85rem; padding: 0.4rem 0.8rem;">{{ pending_count }} Pending</span>
+                {% endif %}
+                <span style="font-size: 0.85rem; font-weight: 600; color: var(--text-muted);">{{ cards|length }} Total Documents</span>
+                <span class="material-symbols-outlined" id="icon-student-{{ student.id }}" style="color: var(--text-muted); transition: transform 0.2s;">expand_more</span>
+            </div>
+        </div>
+        
+        <div id="student-{{ student.id }}" style="display: none; margin-top: 1rem; padding-top: 1rem; border-top: 1px dashed var(--border-color);">
+            <div class="table-responsive">
+                <table class="table" style="margin: 0;">
+                    <thead>
+                        <tr style="background: rgba(0,0,0,0.02);">
+                            <th>Semester</th>
+                            <th>Document</th>
+                            <th>Status</th>
+                            <th>Submitted</th>
+                            <th style="text-align: right;">Action / Notes</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for card in cards %}
+                        <tr>
+                            <td><span style="background: rgba(212,175,55,0.1); color: var(--accent); padding: 0.25rem 0.75rem; border-radius: 50px; font-weight: 700; font-size: 0.85rem;">Sem {{ card.semester }}</span></td>
+                            <td>
+                                <a href="{{ url_for('static', filename='uploads/marks_cards/' + card.file_path) }}" target="_blank" class="btn-outline" style="padding: 0.3rem 0.6rem; font-size: 0.8rem; display: inline-flex; align-items: center; gap: 0.25rem;">
+                                    <span class="material-symbols-outlined" style="font-size: 14px;">description</span> View File
+                                </a>
+                            </td>
+                            <td>
+                                {% if card.status == 'Pending' %}
+                                <span style="color: var(--warning); font-weight: 700; font-size: 0.85rem;"><span class="material-symbols-outlined" style="font-size: 14px; vertical-align: middle;">pending</span> Pending</span>
+                                {% elif card.status == 'Verified' %}
+                                <span style="color: var(--success); font-weight: 700; font-size: 0.85rem;"><span class="material-symbols-outlined" style="font-size: 14px; vertical-align: middle;">check_circle</span> Verified</span>
+                                {% else %}
+                                <span style="color: var(--danger); font-weight: 700; font-size: 0.85rem;"><span class="material-symbols-outlined" style="font-size: 14px; vertical-align: middle;">cancel</span> Rejected</span>
+                                {% endif %}
+                            </td>
+                            <td style="font-size: 0.9rem; color: var(--text-muted);">{{ card.uploaded_at.strftime('%b %d, %Y') }}</td>
+                            <td style="text-align: right;">
+                                {% if card.status == 'Pending' %}
+                                <form method="POST" action="{{ url_for('admin.verify_marks_card', id=card.id) }}" style="display: flex; gap: 0.5rem; justify-content: flex-end; align-items: center;">
+                                    <input type="text" name="admin_notes" placeholder="Notes (Opt)" style="padding: 0.3rem; border: 1px solid var(--border-color); border-radius: 4px; font-size: 0.8rem; width: 120px;" />
+                                    <button type="submit" name="action" value="verify" class="btn-premium" style="background: var(--success); color: white; padding: 0.3rem 0.6rem; font-size: 0.8rem; min-width: 70px;">
+                                        Verify
+                                    </button>
+                                    <button type="submit" name="action" value="reject" class="btn-outline" style="color: var(--danger); border-color: var(--danger); padding: 0.3rem 0.6rem; font-size: 0.8rem; min-width: 70px;">
+                                        Reject
+                                    </button>
+                                </form>
+                                {% else %}
+                                <span style="color: var(--text-muted); font-size: 0.85rem;">{{ card.admin_notes if card.admin_notes else '-' }}</span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% else %}
+<div class="glass-panel" style="display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 4rem; color: var(--text-muted); margin-top: 1.5rem;">
+    <span class="material-symbols-outlined" style="font-size: 48px; margin-bottom: 1rem; opacity: 0.5;">inventory_2</span>
+    <p style="font-weight: 500; font-size: 1.1rem;">No marks cards submitted yet.</p>
+</div>
+{% endif %}
+
+<script>
+function toggleDetails(id) {
+    var elem = document.getElementById(id);
+    var icon = document.getElementById('icon-' + id);
+    if (elem.style.display === 'none') {
+        elem.style.display = 'block';
+        icon.style.transform = 'rotate(180deg)';
+    } else {
+        elem.style.display = 'none';
+        icon.style.transform = 'rotate(0deg)';
+    }
+}
+</script>
+{% endblock %}

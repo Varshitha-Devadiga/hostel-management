@@ -1,0 +1,171 @@
+{% extends "student/student_base.html" %}
+{% block title %}Notifications | BCWD{% endblock %}
+{% block page_title %}Notifications{% endblock %}
+
+{% block extra_head %}
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet">
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script>
+    tailwind.config = {
+        darkMode: "class",
+        theme: {
+            extend: {
+                "colors": {
+                    "primary-fixed": "#ffdbd0",
+                    "surface-container": "#f0eded",
+                    "surface-container-high": "#eae8e7",
+                    "primary-container": "#5d4037",
+                    "secondary-container": "#fed7ca",
+                    "secondary": "#75584d",
+                    "surface": "#fbf9f8",
+                    "on-primary": "#ffffff",
+                    "on-primary-container": "#d4ada1",
+                    "surface-container-low": "#f5f3f3",
+                    "error-container": "#ffdad6",
+                    "primary": "#442a22",
+                    "on-error": "#ffffff",
+                    "background": "#fbf9f8",
+                    "outline": "#827470",
+                    "outline-variant": "#d4c3be",
+                    "on-surface": "#1b1c1c",
+                    "on-surface-variant": "#504441",
+                    "on-secondary-container": "#795c51",
+                    "surface-container-lowest": "#ffffff"
+                }
+            }
+        }
+    }
+</script>
+<style>
+    .material-symbols-outlined {font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;}
+    
+    .masonry-grid {
+        column-count: 1;
+        column-gap: 1.5rem;
+    }
+    @media (min-width: 768px) {
+        .masonry-grid {
+            column-count: 2;
+        }
+    }
+    .masonry-item {
+        break-inside: avoid;
+        margin-bottom: 1.5rem;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<main class="flex-1 p-6 md:p-8 overflow-x-hidden max-w-6xl mx-auto">
+    
+    <div class="flex items-center gap-3 mb-4">
+        <a href="{{ url_for('student.dashboard') }}" class="p-2 hover:bg-surface-container rounded-full transition-colors text-on-surface-variant">
+            <span class="material-symbols-outlined">arrow_back</span>
+        </a>
+        <div>
+            <h1 class="text-3xl font-bold text-primary">Notifications</h1>
+        </div>
+    </div>
+    
+    <p class="text-sm text-on-surface-variant mb-8 max-w-3xl ml-12">Stay updated with the latest hostel announcements, scholarship deadlines, and administrative notices.</p>
+
+    <div class="ml-12 mb-8 flex flex-wrap gap-2">
+        {% set tabs = ['All', 'Hostel', 'Scholarship', 'Meeting', 'Holiday'] %}
+        {% for tab in tabs %}
+            <a href="{{ url_for('student.notifications', category=tab) }}" 
+               class="px-5 py-2 rounded-full text-xs font-bold transition-colors shadow-sm 
+               {% if current_category == tab %}
+                    bg-primary text-white border-primary
+               {% else %}
+                    bg-white text-on-surface-variant hover:text-primary border border-outline-variant/30
+               {% endif %}">
+                {{ tab if tab != 'All' else 'All Notices' }}
+            </a>
+        {% endfor %}
+    </div>
+
+    <div class="ml-12 masonry-grid">
+        {% if notices %}
+            {% for notice in notices %}
+                
+                {% set bg_class = "bg-surface text-on-surface border border-outline-variant" %}
+                {% set text_primary = "text-primary" %}
+                {% set text_secondary = "text-on-surface-variant" %}
+                {% set badge_bg = "bg-[#ffe5d9]" %}
+                {% set badge_text = "text-[#b84a2d]" %}
+                {% set button_class = "bg-primary text-white hover:bg-primary-container" %}
+                
+                {% if notice.category == 'Holiday' %}
+                    {% set bg_class = "bg-primary text-white border-primary" %}
+                    {% set text_primary = "text-white" %}
+                    {% set text_secondary = "text-white/80" %}
+                    {% set badge_bg = "bg-white/20" %}
+                    {% set badge_text = "text-white" %}
+                    {% set button_class = "bg-white text-primary hover:bg-surface-container-low" %}
+                {% elif notice.category == 'Scholarship' %}
+                    {% set badge_bg = "bg-[#ffe5d9]" %}
+                    {% set badge_text = "text-[#b84a2d]" %}
+                {% elif notice.category == 'Meeting' %}
+                    {% set badge_bg = "bg-[#ffdac1]" %}
+                    {% set badge_text = "text-[#b87042]" %}
+                {% elif notice.category == 'Hostel' %}
+                    {% set badge_bg = "bg-surface-container-high" %}
+                    {% set badge_text = "text-on-surface-variant" %}
+                {% endif %}
+
+                <div class="masonry-item {{ bg_class }} rounded-2xl overflow-hidden shadow-sm hover:shadow-md transition-shadow">
+                    
+                    {% if notice.image_url %}
+                    <div class="w-full h-40 bg-cover bg-center dynamic-bg" data-bg="url('{{ notice.image_url }}')"></div>
+                    {% endif %}
+                    
+                    <div class="p-6">
+                        <div class="flex justify-between items-center mb-4">
+                            <span class="{{ badge_bg }} {{ badge_text }} text-[10px] font-bold px-3 py-1 rounded-full uppercase tracking-wider">{{ notice.category }}</span>
+                            <span class="text-[10px] {{ text_secondary }} font-medium">{{ notice.created_at.strftime('%b %d, %Y') }}</span>
+                        </div>
+                        
+                        <h3 class="text-lg font-bold {{ text_primary }} mb-2">{{ notice.title }}</h3>
+                        <p class="text-xs {{ text_secondary }} leading-relaxed">{{ notice.description }}</p>
+                        
+                        {% if notice.priority == 'High' %}
+                        <div class="mt-4 flex items-start gap-2 bg-[#ffe5d9] p-3 rounded-lg border border-[#ffcdb2]">
+                            <span class="material-symbols-outlined text-[16px] text-[#b84a2d]">warning</span>
+                            <p class="text-xs font-bold text-[#b84a2d]">Maintenance Period: 6 Hours</p>
+                        </div>
+                        {% endif %}
+                        
+                        {% if notice.action_link and notice.action_text %}
+                        <div class="mt-6 flex justify-end">
+                            <a href="{{ notice.action_link }}" class="{{ button_class }} text-xs font-bold py-2 px-6 rounded-lg transition-colors shadow-sm inline-flex items-center gap-1">
+                                {{ notice.action_text }}
+                                {% if notice.action_text == 'View Menu' %}
+                                <span class="material-symbols-outlined text-[14px]">restaurant</span>
+                                {% else %}
+                                <span class="material-symbols-outlined text-[14px]">arrow_forward</span>
+                                {% endif %}
+                            </a>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+            {% endfor %}
+        {% else %}
+            <div class="col-span-full text-center py-16 bg-surface rounded-2xl border border-dashed border-outline-variant">
+                <span class="material-symbols-outlined text-4xl text-outline opacity-50 mb-3 block">notifications_paused</span>
+                <p class="text-sm font-medium text-on-surface-variant">No notifications found in this category.</p>
+            </div>
+        {% endif %}
+    </div>
+    
+    {% if notices|length > 0 %}
+    <div class="text-center mt-4">
+        <button class="bg-white border border-outline-variant text-on-surface-variant text-xs font-bold py-2 px-6 rounded-full hover:bg-surface-container transition-colors inline-flex items-center gap-2 shadow-sm">
+            Load Previous Notices <span class="material-symbols-outlined text-[14px]">history</span>
+        </button>
+    </div>
+    {% endif %}
+    
+</main>
+{% endblock %}

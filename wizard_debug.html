@@ -1,0 +1,616 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Student Registration | BCWD Hostel Portal</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Outfit:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/static/css/style.css" />
+  
+<!-- Custom Premium Theme -->
+<link href="/static/css/theme.css" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet">
+<style>
+    /* Wizard Specific CSS */
+    .form-group {
+        display: flex;
+        flex-direction: column;
+        justify-content: flex-start;
+    }
+    .form-group > .form-label {
+        margin-bottom: 0.5rem;
+    }
+    .wizard-step { display: none; }
+    .wizard-step.active { display: block; animation: fadeInUp 0.5s ease; }
+    .wizard-nav { display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; }
+    .wizard-nav-item { display: flex; flex-direction: column; align-items: center; gap: 0.5rem; }
+    .wizard-nav-circle { width: 40px; height: 40px; border-radius: 50%; background: rgba(0,0,0,0.05); border: 2px solid var(--border-color); display: flex; align-items: center; justify-content: center; font-weight: 700; color: var(--text-muted); transition: var(--transition); }
+    .wizard-nav-item.active .wizard-nav-circle { background: var(--primary); color: var(--text-inverse); border-color: var(--primary); box-shadow: 0 0 10px rgba(44, 26, 20, 0.3); }
+    .wizard-nav-item.completed .wizard-nav-circle { background: var(--success); color: var(--text-inverse); border-color: var(--success); }
+    .wizard-nav-line { flex: 1; height: 2px; background: var(--border-color); margin: 0 1rem; position: relative; top: -10px; }
+    
+    .file-upload-box { border: 2px dashed var(--border-color); border-radius: 12px; padding: 1.5rem; text-align: center; background: rgba(0,0,0,0.02); transition: var(--transition); cursor: pointer; }
+    .file-upload-box:hover { border-color: var(--accent); background: rgba(212,175,55,0.05); }
+    .error-msg { color: var(--danger); font-size: 0.85rem; margin-top: 0.25rem; display: block; }
+    
+    /* Validation States */
+    .is-invalid {
+        border-color: var(--danger) !important;
+        background-color: rgba(220, 53, 69, 0.05) !important;
+        box-shadow: 0 0 0 3px rgba(220, 53, 69, 0.1) !important;
+    }
+    .label-invalid {
+        color: var(--danger) !important;
+        font-weight: 600;
+    }
+</style>
+
+</head>
+<body>
+  <header class="site-header">
+    <div class="container header-inner">
+
+      <div class="header-text">
+        <h1>ಶ್ರೀ ಡಿ. ದೇವರಾಜ ಅರಸು</h1>
+        <h2>ಹಿಂದುಳಿದ ವರ್ಗಗಳ ಕಲ್ಯಾಣ ಇಲಾಖೆ</h2>
+        <p class="tagline">ವೃತ್ತಿಪರ ಮಹಿಳಾ ವಿದ್ಯಾರ್ಥಿ ನಿಲಯ, ಬಿಜೈ ಪಡೀಲ್ | BCWD - 1878</p>
+      </div>
+    </div>
+  </header>
+  <main class="site-main">
+    
+      
+    
+    
+<div class="content-wrapper" style="max-width: 900px;">
+    <div style="text-align: center; margin-bottom: 2rem;">
+        <h2 class="header-title" style="justify-content: center; font-size: 2rem;">Student Registration</h2>
+        <p style="color: var(--text-muted);">Complete your profile to apply for the Women's Hostel.</p>
+    </div>
+
+    <!-- Wizard Navigation -->
+    <div class="wizard-nav">
+        <div class="wizard-nav-item active" id="node-1">
+            <div class="wizard-nav-circle">1</div>
+            <span style="font-size: 0.85rem; font-weight: 600;">Credentials</span>
+        </div>
+        <div class="wizard-nav-line"></div>
+        <div class="wizard-nav-item" id="node-2">
+            <div class="wizard-nav-circle">2</div>
+            <span style="font-size: 0.85rem; font-weight: 600;">Personal</span>
+        </div>
+        <div class="wizard-nav-line"></div>
+        <div class="wizard-nav-item" id="node-3">
+            <div class="wizard-nav-circle">3</div>
+            <span style="font-size: 0.85rem; font-weight: 600;">College</span>
+        </div>
+        <div class="wizard-nav-line"></div>
+        <div class="wizard-nav-item" id="node-4">
+            <div class="wizard-nav-circle">4</div>
+            <span style="font-size: 0.85rem; font-weight: 600;">Documents</span>
+        </div>
+    </div>
+
+    
+        
+    
+
+    <form method="POST" enctype="multipart/form-data" action="/register/student/wizard" id="wizardForm" novalidate>
+        <input id="csrf_token" name="csrf_token" type="hidden" value="IjI2MTM5YTUxZDM3YWZiMDkxYWJhMDgyM2NiMmRiMGVmY2IzNTkyN2Ei.ajO5pQ.IjD0DKnOT4kDg3Neq0W8HkOh2-w">
+        
+        <!-- Step 1: Account Credentials -->
+        <div class="glass-panel wizard-step active" id="step-1">
+            <h3 style="border-bottom: 1px solid var(--border-color); padding-bottom: 0.5rem; margin-bottom: 1.5rem; display: flex; align-items: center; gap: 0.5rem; color: var(--primary);">
+                <span class="material-symbols-outlined">lock</span> Account Credentials
+            </h3>
+            <div class="grid-cols-3">
+                <div class="form-group">
+                    <label class="form-label">Email Address *</label>
+                    <input class="form-control" id="email" name="email" placeholder="student@example.com" required type="text" value="">
+                    
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Password *</label>
+                    <input class="form-control" id="password" name="password" placeholder="Min 6 characters" required type="password" value="">
+                    
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Confirm Password *</label>
+                    <input class="form-control" id="confirm_password" name="confirm_password" placeholder="Re-enter password" required type="password" value="">
+                    
+                </div>
+            </div>
+        </div>
+
+        <!-- Step 2: Personal Details -->
+        <div class="glass-panel wizard-step" id="step-2">
+            <h3 style="border-bottom: 1px solid var(--border-color); padding-bottom: 0.5rem; margin-bottom: 1.5rem; display: flex; align-items: center; gap: 0.5rem; color: var(--primary);">
+                <span class="material-symbols-outlined">person</span> Personal Information
+            </h3>
+            <div class="grid-cols-3">
+                <div class="form-group">
+                    <label class="form-label">Full Name *</label>
+                    <input class="form-control" id="full_name" name="full_name" required type="text" value="">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Date of Birth *</label>
+                    <input class="form-control" id="dob" name="dob" required type="date" value="">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Mobile Number *</label>
+                    <input class="form-control" id="mobile" maxlength="10" name="mobile" placeholder="10 Digits" required type="text" value="">
+                    
+                </div>
+            </div>
+
+            <h3 style="border-bottom: 1px solid var(--border-color); padding-bottom: 0.5rem; margin-bottom: 1.5rem; margin-top: 1rem; display: flex; align-items: center; gap: 0.5rem; color: var(--primary);">
+                <span class="material-symbols-outlined">family_history</span> Parent/Guardian Details
+            </h3>
+            <div class="grid-cols-2">
+                <div class="form-group">
+                    <label class="form-label">Father's Name *</label>
+                    <input class="form-control" id="father_name" name="father_name" required type="text" value="">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Mother's Name *</label>
+                    <input class="form-control" id="mother_name" name="mother_name" required type="text" value="">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Parent Mobile Number *</label>
+                    <input class="form-control" id="guardian_mobile" maxlength="10" name="guardian_mobile" placeholder="10 Digits" required type="text" value="">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Guardian Number (Optional)</label>
+                    <input class="form-control" id="emergency_contact" maxlength="10" name="emergency_contact" placeholder="10 Digits" type="text" value="">
+                </div>
+            </div>
+        </div>
+
+        <!-- Step 3: College & Diet -->
+        <div class="glass-panel wizard-step" id="step-3">
+            <h3 style="border-bottom: 1px solid var(--border-color); padding-bottom: 0.5rem; margin-bottom: 1.5rem; display: flex; align-items: center; gap: 0.5rem; color: var(--primary);">
+                <span class="material-symbols-outlined">school</span> College Information
+            </h3>
+            <div class="grid-cols-2">
+                <div class="form-group">
+                    <label class="form-label">College Name *</label>
+                    <input class="form-control" id="college" list="college-options" name="college" placeholder="Select or type your college" required type="text" value="">
+                    <datalist id="college-options">
+                        <option value="St. Aloysius College">
+                        <option value="St. Agnes College">
+                        <option value="Canara College">
+                        <option value="SDM College of Business Management">
+                        <option value="Besant Women's College">
+                        <option value="University College Mangaluru">
+                        <option value="Mangalore University">
+                        <option value="Nitte Institute of Communication">
+                        <option value="Father Muller Medical College">
+                        <option value="Kasturba Medical College (KMC)">
+                        <option value="Sahyadri College of Engineering & Management">
+                        <option value="St. Joseph Engineering College (SJEC)">
+                        <option value="Srinivas Institute of Technology">
+                        <option value="Alva's College">
+                        <option value="Padua College of Commerce and Management">
+                        <option value="Milagres College">
+                        <option value="Roshni Nilaya (School of Social Work)">
+                        <option value="Govinda Dasa College">
+                        <option value="Government First Grade College">
+                    </datalist>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Place *</label>
+                    <input class="form-control" id="university" list="place-options" name="university" placeholder="Enter Place" required type="text" value="">
+                    <datalist id="place-options">
+                        <option value="Hampankatta">
+                        <option value="Kodialbail">
+                        <option value="Bendore">
+                        <option value="Kankanady">
+                        <option value="Bejai">
+                        <option value="Valencia">
+                        <option value="Nanthoor">
+                        <option value="Vamanjoor">
+                        <option value="Adyar">
+                        <option value="Surathkal">
+                        <option value="Konaje">
+                        <option value="Deralakatte">
+                        <option value="Valachil">
+                        <option value="Mukka">
+                        <option value="Moodbidri">
+                        <option value="Car Street">
+                    </datalist>
+                </div>
+                <div class="form-group" style="grid-column: span 2;">
+                    <label class="form-label">Course *</label>
+                    <input class="form-control" id="courseSelector" list="course-options" name="course" placeholder="Select or type your course" required type="text" value="">
+                    <datalist id="course-options">
+                        <option value="Engineering">
+                        <option value="B.E. / B.Tech">
+                        <option value="BCA">
+                        <option value="B.Sc.">
+                        <option value="B.Com">
+                        <option value="BA">
+                        <option value="Masters Degree (M.A, M.Sc, MBA, etc)">
+                        <option value="Nursing">
+                        <option value="Paramedical">
+                    </datalist>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Semester *</label>
+                    <select class="form-control" id="semester" name="semester" required><option value="1">1st Semester</option><option value="2">2nd Semester</option><option value="3">3rd Semester</option><option value="4">4th Semester</option><option value="5">5th Semester</option><option value="6">6th Semester</option><option value="7">7th Semester</option><option value="8">8th Semester</option><option value="9">9th Semester</option><option value="10">10th Semester</option></select>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Admission Year *</label>
+                    <input class="form-control" id="admission_year" name="admission_year" placeholder="e.g. 2024" required type="number" value="">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Course Duration *</label>
+                    <select class="form-control" id="course_duration" name="course_duration" required><option value="1">1 Year</option><option value="2">2 Years</option><option value="3">3 Years</option><option value="4">4 Years</option><option value="5">5 Years</option><option value="6">6 Years</option></select>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Expected Completion</label>
+                    <input class="form-control" id="completion_year" name="completion_year" placeholder="Auto-calculated" readonly type="number" value="">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">HOD Name</label>
+                    <input class="form-control" id="hod_name" name="hod_name" type="text" value="">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">HOD Phone *</label>
+                    <input class="form-control" id="hod_phone" maxlength="10" name="hod_phone" placeholder="10-digit phone" required type="text" value="">
+                </div>
+            </div>
+
+            <h3 style="border-bottom: 1px solid var(--border-color); padding-bottom: 0.5rem; margin-bottom: 1.5rem; margin-top: 1rem; display: flex; align-items: center; gap: 0.5rem; color: var(--primary);">
+                <span class="material-symbols-outlined">restaurant</span> Food Preferences
+            </h3>
+            <div style="background: rgba(0,0,0,0.02); padding: 1rem; border-radius: 8px; margin-bottom: 1.5rem; display: flex; gap: 1rem;">
+                
+                <label style="cursor: pointer; display: flex; align-items: center; gap: 0.5rem;">
+                    <input class="diet-radio" id="diet-0" name="diet" required style="accent-color: var(--primary);" type="radio" value="veg"> Vegetarian
+                </label>
+                
+                <label style="cursor: pointer; display: flex; align-items: center; gap: 0.5rem;">
+                    <input class="diet-radio" id="diet-1" name="diet" required style="accent-color: var(--primary);" type="radio" value="non-veg"> Non-Vegetarian
+                </label>
+                
+            </div>
+            <div class="grid-cols-4">
+                <label style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer; padding: 0.5rem; background: rgba(255,255,255,0.5); border-radius: 8px; border: 1px solid var(--border-color);">
+                    <input name="food_items" value="egg" type="checkbox" class="food-item-check" style="accent-color: var(--primary);"> 🥚 Egg
+                </label>
+                <label style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer; padding: 0.5rem; background: rgba(255,255,255,0.5); border-radius: 8px; border: 1px solid var(--border-color);">
+                    <input name="food_items" value="chicken" type="checkbox" class="food-item-check" style="accent-color: var(--primary);"> 🍗 Chicken
+                </label>
+                <label style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer; padding: 0.5rem; background: rgba(255,255,255,0.5); border-radius: 8px; border: 1px solid var(--border-color);">
+                    <input name="food_items" value="fish" type="checkbox" class="food-item-check" style="accent-color: var(--primary);"> 🐟 Fish
+                </label>
+
+            </div>
+        </div>
+
+        <!-- Step 4: Documents -->
+        <div class="glass-panel wizard-step" id="step-4">
+            <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border-color); padding-bottom: 0.5rem; margin-bottom: 1.5rem;">
+                <h3 style="display: flex; align-items: center; gap: 0.5rem; color: var(--primary); margin: 0;">
+                    <span class="material-symbols-outlined">upload_file</span> Documents Upload
+                </h3>
+                <div class="badge badge-info"><span class="material-symbols-outlined" style="font-size: 14px; vertical-align: middle;">info</span> Hard copies required within 60 days</div>
+            </div>
+            
+            <div class="grid-cols-2" style="margin-bottom: 2rem;">
+                <!-- Aadhaar Section -->
+                <div style="display: flex; flex-direction: column; gap: 1rem; padding: 1.5rem; background: rgba(0,0,0,0.02); border-radius: 12px; border: 1px solid var(--border-color);">
+                    <div class="form-group" style="margin: 0;">
+                        <label class="form-label" style="display: flex; align-items: center; gap: 0.5rem; color: var(--primary);">
+                            <span class="material-symbols-outlined">badge</span> Aadhaar Number *
+                        </label>
+                        <input class="form-control" id="aadhaar_number" name="aadhaar_number" placeholder="Enter 12-digit Aadhaar Number" required type="text" value="">
+                        
+                    </div>
+                    <div class="file-upload-box" onclick="document.getElementById('aadhaarFile').click()" style="background: white;">
+                        <span class="material-symbols-outlined" style="font-size: 32px; color: var(--text-muted);">upload_file</span>
+                        <p style="font-weight: 600; margin: 0.5rem 0; font-size: 0.9rem;">Upload Aadhaar Scan *</p>
+                        <input accept=".pdf,.png,.jpg" class="file-input" id="aadhaarFile" name="aadhaar" required style="display: none;" type="file">
+                        <div id="aadhaarFile-status" style="font-size: 0.85rem; color: var(--text-muted); font-style: italic;">No file selected</div>
+                    </div>
+                </div>
+
+                <!-- Ration Card Section -->
+                <div style="display: flex; flex-direction: column; gap: 1rem; padding: 1.5rem; background: rgba(0,0,0,0.02); border-radius: 12px; border: 1px solid var(--border-color);">
+                    <div class="form-group" style="margin: 0;">
+                        <label class="form-label" style="display: flex; align-items: center; gap: 0.5rem; color: var(--primary);">
+                            <span class="material-symbols-outlined">receipt_long</span> Ration Card Number *
+                        </label>
+                        <input class="form-control" id="ration_card_number" name="ration_card_number" placeholder="Enter Ration Card Number" required type="text" value="">
+                        
+                    </div>
+                    <div class="file-upload-box" onclick="document.getElementById('rationFile').click()" style="background: white;">
+                        <span class="material-symbols-outlined" style="font-size: 32px; color: var(--text-muted);">upload_file</span>
+                        <p style="font-weight: 600; margin: 0.5rem 0; font-size: 0.9rem;">Upload Ration Card Scan *</p>
+                        <input accept=".pdf,.png,.jpg" class="file-input" id="rationFile" name="ration_card" required style="display: none;" type="file">
+                        <div id="rationFile-status" style="font-size: 0.85rem; color: var(--text-muted); font-style: italic;">No file selected</div>
+                    </div>
+                </div>
+
+                <!-- Additional Documents Section -->
+                <div class="file-upload-box" onclick="document.getElementById('photoFile').click()">
+                    <span class="material-symbols-outlined" style="font-size: 32px; color: var(--text-muted);">add_a_photo</span>
+                    <p style="font-weight: 600; margin: 0.5rem 0;">Passport Photo</p>
+                    <input accept="image/*" class="file-input" id="photoFile" name="photo" style="display: none;" type="file">
+                    <div id="photoFile-status" style="font-size: 0.85rem; color: var(--text-muted); font-style: italic;">No file selected</div>
+                </div>
+                
+                <div class="file-upload-box" onclick="document.getElementById('collegeIdFile').click()">
+                    <span class="material-symbols-outlined" style="font-size: 32px; color: var(--text-muted);">perm_identity</span>
+                    <p style="font-weight: 600; margin: 0.5rem 0;">College ID *</p>
+                    <input accept=".pdf,.png,.jpg" class="file-input" id="collegeIdFile" name="college_id" style="display: none;" type="file">
+                    <div id="collegeIdFile-status" style="font-size: 0.85rem; color: var(--text-muted); font-style: italic;">No file selected</div>
+                </div>
+            </div>
+            
+            <div style="background: rgba(255, 193, 7, 0.1); padding: 1rem; border-radius: 8px; display: flex; align-items: flex-start; gap: 1rem; border: 1px solid rgba(255, 193, 7, 0.3);">
+                <input id="agreeCheck" name="agree" required style="margin-top: 0.25rem; accent-color: var(--primary);" type="checkbox" value="y">
+                <label for="agreeCheck" style="font-size: 0.9rem; color: var(--primary); cursor: pointer;">I hereby declare that all entries recorded across this registration framework are strictly true, verifiable, and legitimate.</label>
+            </div>
+        </div>
+
+        <!-- Navigation Buttons -->
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 2rem;">
+            <button type="button" id="prevBtn" class="btn-outline" style="visibility: hidden;" onclick="navigateStep(-1)">Previous</button>
+            <button type="button" id="nextBtn" class="btn-premium" onclick="navigateStep(1)">Next Step</button>
+            <button id="submitBtn" type="submit" class="btn-premium" style="display: none; background: linear-gradient(135deg, var(--success) 0%, #1e7e34 100%); color: white;">
+                Complete Registration <span class="material-symbols-outlined">check_circle</span>
+            </button>
+        </div>
+    </form>
+</div>
+
+  </main>
+  <footer class="site-footer">
+    <div class="container footer-inner">
+      <p>BACKWARD CLASSES WELFARE DEPARTMENT</p>
+      <p>Women's Hostel, Bijai Padil</p>
+      <p>BCWD - 1878</p>
+    </div>
+  </footer>
+  
+<script>
+  let currentStep = 1;
+  const totalSteps = 4;
+
+  function navigateStep(direction) {
+    const currentStepEl = document.getElementById(`step-${currentStep}`);
+
+    if (currentStepEl) currentStepEl.classList.remove('active');
+    const currentNodeEl = document.getElementById(`node-${currentStep}`);
+    if (currentNodeEl) {
+        currentNodeEl.classList.remove('active');
+        if (direction > 0) currentNodeEl.classList.add('completed');
+    }
+
+    currentStep += direction;
+    
+    const nextStepEl = document.getElementById(`step-${currentStep}`);
+    if (nextStepEl) nextStepEl.classList.add('active');
+    const nextNodeEl = document.getElementById(`node-${currentStep}`);
+    if (nextNodeEl) nextNodeEl.classList.add('active');
+
+    document.getElementById('prevBtn').style.visibility = (currentStep === 1) ? 'hidden' : 'visible';
+    
+    if (currentStep === totalSteps) {
+        document.getElementById('nextBtn').style.display = 'none';
+        document.getElementById('submitBtn').style.display = 'inline-flex';
+    } else {
+        document.getElementById('nextBtn').style.display = 'inline-flex';
+        document.getElementById('submitBtn').style.display = 'none';
+    }
+  }
+</script>
+
+<script>
+
+  document.querySelectorAll('.file-input').forEach(input => {
+    input.addEventListener('change', function () {
+        const statusDiv = document.getElementById(`${this.id}-status`);
+        const box = this.closest('.file-upload-box');
+        let iconEl = box.querySelector('.material-symbols-outlined');
+        let previewEl = box.querySelector('.image-preview');
+
+        if (this.files && this.files.length > 0) {
+            const file = this.files[0];
+            statusDiv.textContent = `Attached: ${file.name}`;
+            statusDiv.style.color = 'var(--success)';
+            statusDiv.style.fontWeight = '600';
+
+            if (file.type.startsWith('image/')) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    if (iconEl) iconEl.style.display = 'none';
+                    if (!previewEl) {
+                        previewEl = document.createElement('img');
+                        previewEl.className = 'image-preview';
+                        previewEl.style.width = '64px';
+                        previewEl.style.height = '64px';
+                        previewEl.style.objectFit = 'cover';
+                        previewEl.style.borderRadius = '8px';
+                        previewEl.style.marginBottom = '0.5rem';
+                        box.insertBefore(previewEl, box.firstChild);
+                    }
+                    previewEl.src = e.target.result;
+                    previewEl.style.display = 'block';
+                }
+                reader.readAsDataURL(file);
+            } else {
+                // Not an image (e.g. PDF)
+                if (iconEl) iconEl.style.display = 'block';
+                if (previewEl) previewEl.style.display = 'none';
+            }
+        } else {
+            statusDiv.textContent = "No file selected";
+            statusDiv.style.color = 'var(--text-muted)';
+            statusDiv.style.fontWeight = 'normal';
+            if (iconEl) iconEl.style.display = 'block';
+            if (previewEl) previewEl.style.display = 'none';
+        }
+    });
+  });
+
+
+
+
+  // --- Dynamic Error Mapping & Real-time Validation ---
+  
+  // 1. Server-Side Error Mapping
+  // Safely parse server errors passed from WTForms
+  const serverErrors = {};
+  let firstErrorStep = null;
+  
+  for (const [fieldName, errors] of Object.entries(serverErrors)) {
+      const field = document.getElementById(fieldName);
+      if (field) {
+          const formGroup = field.closest('.form-group');
+          if (formGroup) {
+              // Highlight input and label
+              field.classList.add('is-invalid');
+              const label = formGroup.querySelector('label');
+              if (label) label.classList.add('label-invalid');
+              
+              // Ensure error message is injected exactly below the field
+              let errorSpan = formGroup.querySelector('.error-msg');
+              if (!errorSpan) {
+                  errorSpan = document.createElement('span');
+                  errorSpan.className = 'error-msg';
+                  field.parentNode.insertBefore(errorSpan, field.nextSibling);
+              }
+              errorSpan.textContent = errors[0]; // Show specific validation error
+          }
+          
+          // Track which step the error occurred on
+          const stepEl = field.closest('.wizard-step');
+          if (stepEl) {
+              const stepMatch = stepEl.id.match(/step-(\d+)/);
+              if (stepMatch) {
+                  const stepNum = parseInt(stepMatch[1]);
+                  if (!firstErrorStep || stepNum < firstErrorStep) {
+                      firstErrorStep = stepNum;
+                  }
+              }
+          }
+      }
+  }
+  
+  // Auto-navigate to the step with the first error if it's not step 1
+  if (firstErrorStep && firstErrorStep > 1) {
+      // Calculate how many steps forward we need to go
+      const stepsToMove = firstErrorStep - currentStep;
+      if (stepsToMove > 0) {
+          navigateStep(stepsToMove);
+      }
+  }
+
+  // 2. Real-time Email Format Validation
+  const emailInput = document.getElementById('email');
+  if (emailInput) {
+      emailInput.addEventListener('input', function() {
+          const formGroup = this.closest('.form-group');
+          const label = formGroup.querySelector('label');
+          let errorSpan = formGroup.querySelector('.error-msg');
+          
+          if (!errorSpan) {
+              errorSpan = document.createElement('span');
+              errorSpan.className = 'error-msg';
+              this.parentNode.insertBefore(errorSpan, this.nextSibling);
+          }
+
+          // Strict regex for real-time typing feedback
+          const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+          
+          if (this.value.length > 0 && !emailRegex.test(this.value)) {
+              this.classList.add('is-invalid');
+              if (label) label.classList.add('label-invalid');
+              errorSpan.textContent = "Invalid email format";
+          } else {
+              // Clear invalid styling if format is correct
+              this.classList.remove('is-invalid');
+              if (label) label.classList.remove('label-invalid');
+              // Only clear text if there wasn't an overriding server error (like 'Email already exists')
+              if (!serverErrors['email']) {
+                  errorSpan.textContent = "";
+              }
+          }
+      });
+  }
+
+  // 3. Food Preferences Logic
+  const dietRadios = document.querySelectorAll('.diet-radio');
+  const foodItemCheckboxes = document.querySelectorAll('.food-item-check');
+  const foodItemsContainer = document.getElementById('food-items-container');
+
+  dietRadios.forEach(radio => {
+      radio.addEventListener('change', function() {
+          if (this.value === 'non-veg') {
+              foodItemsContainer.style.display = 'flex';
+          } else {
+              foodItemsContainer.style.display = 'none';
+              // Uncheck all when switching to veg
+              foodItemCheckboxes.forEach(cb => {
+                  cb.checked = false;
+              });
+          }
+      });
+  });
+
+  // Initial check on load
+  const vegRadio = document.querySelector('input.diet-radio[value="veg"]');
+  if (vegRadio && vegRadio.checked) {
+      foodItemsContainer.style.display = 'none';
+      foodItemCheckboxes.forEach(cb => {
+          cb.checked = false;
+      });
+  } else {
+      const nonVegRadio = document.querySelector('input.diet-radio[value="non-veg"]');
+      if (nonVegRadio && nonVegRadio.checked) {
+          foodItemsContainer.style.display = 'flex';
+      } else {
+          // Default to hidden if nothing is checked
+          foodItemsContainer.style.display = 'none';
+      }
+  }
+
+  // Restrict DOB to at least 15 years ago
+  const dobInput = document.getElementById('dob');
+  if (dobInput) {
+      const today = new Date();
+      // Calculate date 15 years ago
+      const maxDate = new Date(today.getFullYear() - 15, today.getMonth(), today.getDate());
+      dobInput.max = maxDate.toISOString().split('T')[0];
+  }
+
+  // Auto-calculate Expected Completion Year
+  const admissionYearInput = document.getElementById('admission_year');
+  const courseDurationInput = document.getElementById('course_duration');
+  const completionYearInput = document.getElementById('completion_year');
+
+  function updateCompletionYear() {
+      if (admissionYearInput && courseDurationInput && completionYearInput) {
+          const admYear = parseInt(admissionYearInput.value);
+          const duration = parseInt(courseDurationInput.value);
+          if (!isNaN(admYear) && !isNaN(duration)) {
+              completionYearInput.value = admYear + duration;
+          } else {
+              completionYearInput.value = "";
+          }
+      }
+  }
+
+  if (admissionYearInput && courseDurationInput) {
+      admissionYearInput.addEventListener('input', updateCompletionYear);
+      courseDurationInput.addEventListener('change', updateCompletionYear);
+      // Run once on load to populate if data already exists
+      updateCompletionYear();
+  }
+
+</script>
+
+</body>
+</html>

@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Staff Login - BCWD Portal</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/theme.css') }}">
+</head>
+<body class="ag-body-gradient">
+    <!-- Header Navigation -->
+    <header class="ag-auth-header">
+        <div class="ag-header-left">
+            <span class="ag-icon-home">🏢</span> <strong>BCWD Staff Portal</strong>
+        </div>
+        <div class="ag-header-right">
+            <a href="#" class="ag-header-link">Official Website</a>
+            <a href="#" class="ag-header-link">Contact Support</a>
+        </div>
+    </header>
+
+    <div class="ag-auth-container">
+        <!-- Center Icon Badge -->
+        <div class="ag-auth-brand-badge">
+            <span class="ag-badge-icon">🔐</span>
+        </div>
+
+        <h1 class="ag-auth-title">Internal Staff Access</h1>
+        <p class="ag-auth-subtitle">Please authenticate to manage hostel resources.</p>
+
+        <!-- Main Form Card -->
+        <div class="ag-card ag-card-elevated ag-glass-panel ag-auth-card">
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    {% for category, msg in messages %}
+                        <div class="ag-alert ag-alert-{{ category }}">{{ msg }}</div>
+                    {% endfor %}
+                {% endif %}
+            {% endwith %}
+
+            <form action="{{ url_for('auth.login_staff') if 'login_staff' in url_for.__globals__ else '#' }}" method="POST" class="ag-form-stack">
+                <div class="ag-form-group">
+                    <label for="email">Staff Email ID</label>
+                    <div class="ag-input-icon-wrapper">
+                        <span class="ag-input-icon">✉️</span>
+                        <input type="email" id="email" name="email" required placeholder="Email Id" class="ag-form-input">
+                    </div>
+                </div>
+
+                <div class="ag-form-group">
+                    <div class="ag-label-row">
+                        <label for="password">Password</label>
+                        <a href="#" class="ag-link-forgot">Forgot Password?</a>
+                    </div>
+                    <div class="ag-input-icon-wrapper">
+                        <span class="ag-input-icon">🔒</span>
+                        <input type="password" id="password" name="password" required placeholder="••••••••" class="ag-form-input">
+                    </div>
+                </div>
+
+                <button type="submit" class="ag-btn-primary ag-btn-block ag-hover-interactive">Sign In to Portal ➔</button>
+            </form>
+
+            <div class="ag-form-divider">
+                <span>New Personnel?</span>
+            </div>
+
+            <a href="{{ url_for('auth.register_staff') if 'register_staff' in url_for.__globals__ else '#' }}" class="ag-btn-secondary ag-btn-block ag-hover-interactive text-center">Register Staff Member</a>
+        </div>
+
+        <!-- Warning Disclaimer Box -->
+        <div class="ag-notice-box">
+            <span class="ag-notice-icon">⚠️</span>
+            <p>Access is restricted to authorized BCWD personnel. All activities are monitored for security and compliance purposes.</p>
+        </div>
+    </div>
+
+    <!-- Footer Meta Layout -->
+    <footer class="ag-auth-footer">
+        <p>Backward Classes Welfare Department (BCWD), Government of Karnataka</p>
+        <div class="ag-footer-links">
+            <a href="#">Privacy Policy</a>
+            <a href="#">Terms of Service</a>
+            <a href="#">Staff Directory</a>
+            <a href="#">Helpdesk</a>
+        </div>
+    </footer>
+</body>
+</html>

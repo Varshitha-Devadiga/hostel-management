@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BCWD Hostel – Student Login</title>
+    <!-- Custom Premium Theme -->
+    <link href="{{ url_for('static', filename='css/theme.css') }}" rel="stylesheet">
+    <!-- Google Icons -->
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet">
+</head>
+<body style="display: flex; align-items: center; justify-content: center;">
+    <div class="glass-panel" style="width: 100%; max-width: 440px; margin: 2rem;">
+        <div style="text-align: center; margin-bottom: 2rem;">
+            <div style="background: rgba(212, 175, 55, 0.1); width: 80px; height: 80px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 1rem;">
+                <span class="material-symbols-outlined" style="font-size: 40px; color: var(--accent);">school</span>
+            </div>
+            <h2 class="header-title" style="justify-content: center; margin-bottom: 0.5rem;">Student Portal</h2>
+            <p style="color: var(--text-muted);">Welcome back! Please enter your details.</p>
+        </div>
+
+        {% with messages = get_flashed_messages(with_categories=true) %}
+          {% if messages %}
+            {% for category, message in messages %}
+              <div class="badge badge-{{ category }}" style="display: block; margin-bottom: 1rem; text-align: center; padding: 0.75rem;">{{ message }}</div>
+            {% endfor %}
+          {% endif %}
+        {% endwith %}
+
+        <form method="POST" action="{{ url_for('auth.login_student') }}" novalidate>
+            {{ form.hidden_tag() }}
+            <div class="form-group">
+                <label class="form-label">Email Address</label>
+                {{ form.email(class="form-control", placeholder="student@bcwd.in") }}
+                {% if form.email.errors %}
+                    <div style="color: var(--danger); font-size: 0.85rem; margin-top: 0.25rem;">
+                        {% for error in form.email.errors %}{{ error }}{% endfor %}
+                    </div>
+                {% endif %}
+            </div>
+            <div class="form-group">
+                <label class="form-label">Password</label>
+                {{ form.password(class="form-control", placeholder="••••••••") }}
+                {% if form.password.errors %}
+                    <div style="color: var(--danger); font-size: 0.85rem; margin-top: 0.25rem;">
+                        {% for error in form.password.errors %}{{ error }}{% endfor %}
+                    </div>
+                {% endif %}
+            </div>
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; font-size: 0.9rem;">
+                <label style="display: flex; align-items: center; gap: 0.5rem; color: var(--text-muted); cursor: pointer;">
+                    {{ form.remember(style="accent-color: var(--accent);") }} Remember me
+                </label>
+                <a href="#" style="font-weight: 500;">Forgot password?</a>
+            </div>
+            <button type="submit" class="btn-premium" style="width: 100%; justify-content: center; font-size: 1.1rem; padding: 1rem;">
+                Secure Login <span class="material-symbols-outlined">login</span>
+            </button>
+        </form>
+
+        <div style="text-align: center; margin-top: 2rem; font-size: 0.9rem; color: var(--text-muted);">
+            Don't have an account? <a href="{{ url_for('auth.register_student_wizard') }}" style="font-weight: 600;">Register Now</a>
+        </div>
+
+        <hr style="border: none; border-top: 1px solid var(--border-color); margin: 2rem 0;">
+        <p style="text-align: center; font-size: 0.85rem; color: var(--text-muted);">© 2026 BCWD Government of Karnataka. All rights reserved.</p>
+    </div>
+</body>
+</html>

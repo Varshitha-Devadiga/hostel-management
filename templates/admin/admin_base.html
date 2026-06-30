@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Admin Portal | BCWD{% endblock %}</title>
+    <!-- Custom Premium Theme -->
+    <link href="{{ url_for('static', filename='css/theme.css') }}" rel="stylesheet">
+    <!-- Google Icons -->
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet">
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    {% block extra_head %}{% endblock %}
+</head>
+<body>
+    <div class="app-container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <span class="material-symbols-outlined" style="font-size: 40px; color: var(--accent);">account_balance</span>
+                <h2 style="font-size: 1.2rem; margin-top: 0.5rem; letter-spacing: 1px;">BCWD WARDEN</h2>
+            </div>
+            <nav class="sidebar-nav">
+                <a href="{{ url_for('admin.dashboard') }}" class="nav-item {% if request.endpoint == 'admin.dashboard' %}active{% endif %}">
+                    <span class="material-symbols-outlined nav-icon">dashboard</span>
+                    <span>Dashboard</span>
+                </a>
+                <a href="{{ url_for('admin.manage_students') }}" class="nav-item {% if 'users' in request.endpoint or 'student' in request.endpoint %}active{% endif %}">
+                    <span class="material-symbols-outlined nav-icon">groups</span>
+                    <span>Students</span>
+                </a>
+
+                <a href="{{ url_for('admin.manage_leaves') }}" class="nav-item {% if 'leave' in request.endpoint %}active{% endif %}">
+                    <span class="material-symbols-outlined nav-icon">event_note</span>
+                    <span>Leaves</span>
+                </a>
+                <a href="{{ url_for('admin.manage_staff') }}" class="nav-item {% if 'staff' in request.endpoint %}active{% endif %}">
+                    <span class="material-symbols-outlined nav-icon">badge</span>
+                    <span>Staff</span>
+                </a>
+                <a href="{{ url_for('admin.manage_food') }}" class="nav-item {% if 'food' in request.endpoint %}active{% endif %}">
+                    <span class="material-symbols-outlined nav-icon">restaurant</span>
+                    <span>Food Menu</span>
+                </a>
+                <a href="{{ url_for('admin.manage_complaints') }}" class="nav-item {% if 'complaint' in request.endpoint %}active{% endif %}">
+                    <span class="material-symbols-outlined nav-icon">report_problem</span>
+                    <span>Complaints</span>
+                </a>
+                <a href="{{ url_for('admin.manage_notices') }}" class="nav-item {% if 'notice' in request.endpoint %}active{% endif %}">
+                    <span class="material-symbols-outlined nav-icon">campaign</span>
+                    <span>Notices</span>
+                </a>
+                <a href="{{ url_for('admin.manage_reports') }}" class="nav-item {% if 'report' in request.endpoint %}active{% endif %}">
+                    <span class="material-symbols-outlined nav-icon">analytics</span>
+                    <span>Reports</span>
+                </a>
+            </nav>
+            <div style="padding: 1.5rem; border-top: 1px solid rgba(255,255,255,0.1);">
+                <a href="{{ url_for('auth.logout') }}" class="nav-item" style="color: var(--danger); padding: 0.5rem 1rem;">
+                    <span class="material-symbols-outlined nav-icon">logout</span>
+                    <span>Logout</span>
+                </a>
+            </div>
+        </aside>
+
+        <!-- Main Content Area -->
+        <main class="main-content">
+            <!-- Top Header -->
+            <header class="top-header">
+                <h2 class="header-title">{% block page_title %}Overview{% endblock %}</h2>
+                <div style="display: flex; align-items: center; gap: 1rem;">
+                    <div style="text-align: right;">
+                        <div style="font-weight: 600; font-size: 0.9rem;">Warden Admin</div>
+                        <div style="font-size: 0.75rem; color: var(--text-muted);">BCWD Hostel</div>
+                    </div>
+                    <div style="width: 40px; height: 40px; border-radius: 50%; background: var(--primary-light); color: var(--accent); display: flex; align-items: center; justify-content: center;">
+                        <span class="material-symbols-outlined">admin_panel_settings</span>
+                    </div>
+                </div>
+            </header>
+
+            <!-- Scrollable Content -->
+            <div class="content-wrapper">
+                {% with messages = get_flashed_messages(with_categories=true) %}
+                    {% if messages %}
+                        {% for category, msg in messages %}
+                            <div class="badge badge-{{ category }}" style="display: block; margin-bottom: 1.5rem; padding: 1rem; border-radius: 8px;">{{ msg }}</div>
+                        {% endfor %}
+                    {% endif %}
+                {% endwith %}
+                
+                {% block content %}{% endblock %}
+            </div>
+        </main>
+    </div>
+    {% block extra_js %}{% endblock %}
+</body>
+</html>

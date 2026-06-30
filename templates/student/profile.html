@@ -1,0 +1,166 @@
+{% extends "student/student_base.html" %}
+{% block title %}My Application | BCWD{% endblock %}
+{% block page_title %}My Application Form{% endblock %}
+
+{% block extra_head %}
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet">
+<style>
+    .material-symbols-outlined {font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;}
+    
+    .profile-container {
+        max-width: 900px;
+        margin: 0 auto;
+        padding: 2rem 1rem;
+    }
+    
+    .glass-panel {
+        background: rgba(255, 255, 255, 0.85);
+        border: 1px solid rgba(74, 44, 17, 0.16);
+        border-radius: 20px;
+        padding: 2rem;
+        box-shadow: 0 8px 32px rgba(74, 44, 17, 0.08);
+        backdrop-filter: blur(12px);
+    }
+    
+    .section-title {
+        font-size: 1.25rem;
+        font-weight: 700;
+        color: #4a2c11;
+        border-bottom: 1px solid rgba(74, 44, 17, 0.15);
+        padding-bottom: 0.75rem;
+        margin-bottom: 1.5rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+    
+    .info-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 1.5rem;
+        margin-bottom: 2rem;
+    }
+    
+    .info-card {
+        background: rgba(0,0,0,0.02);
+        padding: 1.25rem;
+        border-radius: 12px;
+        border: 1px solid rgba(74, 44, 17, 0.08);
+    }
+    
+    .info-label {
+        font-size: 0.75rem;
+        font-weight: 700;
+        color: #827470;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        margin-bottom: 0.25rem;
+    }
+    
+    .info-value {
+        font-size: 1.05rem;
+        font-weight: 600;
+        color: #333;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="profile-container">
+    <!-- Header -->
+    <div style="display: flex; align-items: center; gap: 1rem; margin-bottom: 2rem;">
+        <a href="{{ url_for('student.dashboard') }}" style="display: flex; align-items: center; justify-content: center; width: 40px; height: 40px; border-radius: 50%; background: rgba(0,0,0,0.05); color: #827470; text-decoration: none; transition: background 0.2s;">
+            <span class="material-symbols-outlined">arrow_back</span>
+        </a>
+        <h1 style="font-size: 2rem; font-weight: 700; color: #4a2c11; margin: 0;">Full Application</h1>
+    </div>
+
+    <div class="glass-panel">
+        {% if profile %}
+        <!-- Personal Information -->
+        <h3 class="section-title">
+            <span class="material-symbols-outlined">person</span> Personal Details
+        </h3>
+        <div class="info-grid">
+            <div class="info-card">
+                <p class="info-label">Full Name</p>
+                <p class="info-value">{{ profile.full_name }}</p>
+            </div>
+            <div class="info-card">
+                <p class="info-label">Mobile Number</p>
+                <p class="info-value">{{ profile.mobile }}</p>
+            </div>
+            <div class="info-card">
+                <p class="info-label">Date of Birth</p>
+                <p class="info-value">{{ profile.dob }}</p>
+            </div>
+            {% if profile.father_name %}
+            <div class="info-card">
+                <p class="info-label">Father's Name</p>
+                <p class="info-value">{{ profile.father_name }}</p>
+            </div>
+            {% endif %}
+            {% if profile.mother_name %}
+            <div class="info-card">
+                <p class="info-label">Mother's Name</p>
+                <p class="info-value">{{ profile.mother_name }}</p>
+            </div>
+            {% endif %}
+            {% if profile.guardian_mobile %}
+            <div class="info-card">
+                <p class="info-label">Parent Mobile Number</p>
+                <p class="info-value">{{ profile.guardian_mobile }}</p>
+            </div>
+            {% endif %}
+            {% if profile.emergency_contact %}
+            <div class="info-card">
+                <p class="info-label">Guardian Number</p>
+                <p class="info-value">{{ profile.emergency_contact }}</p>
+            </div>
+            {% endif %}
+        </div>
+        
+        <!-- Academic Information -->
+        <h3 class="section-title" style="margin-top: 1rem;">
+            <span class="material-symbols-outlined">school</span> Academic Details
+        </h3>
+        <div class="info-grid">
+            <div class="info-card">
+                <p class="info-label">College Name</p>
+                <p class="info-value">{{ profile.college }}</p>
+            </div>
+            <div class="info-card">
+                <p class="info-label">Course</p>
+                <p class="info-value">{{ profile.course }}</p>
+            </div>
+            <div class="info-card">
+                <p class="info-label">Semester</p>
+                <p class="info-value">{{ profile.semester }}</p>
+            </div>
+            {% if profile.admission_year %}
+            <div class="info-card">
+                <p class="info-label">Admission Year</p>
+                <p class="info-value">{{ profile.admission_year }}</p>
+            </div>
+            {% endif %}
+        </div>
+        
+        <!-- Document & Status Section -->
+        <div style="background: rgba(40, 167, 69, 0.05); border: 1px solid rgba(40, 167, 69, 0.2); padding: 1.5rem; border-radius: 12px; display: flex; align-items: center; gap: 1rem; margin-top: 2rem;">
+            <span class="material-symbols-outlined" style="font-size: 32px; color: #28a745;">verified_user</span>
+            <div>
+                <p style="font-size: 1rem; font-weight: 700; color: #1e7e34; margin: 0 0 0.25rem 0;">Application Submitted</p>
+                <p style="font-size: 0.85rem; color: #555; margin: 0;">Your application and documents are under review by the hostel warden.</p>
+            </div>
+        </div>
+
+        {% else %}
+        <div style="text-align: center; padding: 4rem 2rem;">
+            <span class="material-symbols-outlined" style="font-size: 48px; color: #ccc; margin-bottom: 1rem;">person_off</span>
+            <p style="font-size: 1.2rem; font-weight: 600; color: #555;">Application data not found</p>
+            <p style="font-size: 0.9rem; color: #888;">Please complete the registration wizard first.</p>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

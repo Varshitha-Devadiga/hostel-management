@@ -1,0 +1,164 @@
+{% extends "base.html" %}
+{% block title %}Confirm Return | BCWD{% endblock %}
+
+{% block extra_head %}
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet">
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script>
+    tailwind.config = {
+        darkMode: "class",
+        theme: {
+            extend: {
+                "colors": {
+                    "primary-fixed": "#ffdbd0",
+                    "surface-container": "#f0eded",
+                    "surface-container-high": "#eae8e7",
+                    "primary-container": "#5d4037",
+                    "secondary-container": "#fed7ca",
+                    "secondary": "#75584d",
+                    "surface": "#fbf9f8",
+                    "on-primary": "#ffffff",
+                    "on-primary-container": "#d4ada1",
+                    "surface-container-low": "#f5f3f3",
+                    "error-container": "#ffdad6",
+                    "primary": "#442a22",
+                    "on-error": "#ffffff",
+                    "background": "#fbf9f8",
+                    "outline": "#827470",
+                    "outline-variant": "#d4c3be",
+                    "on-surface": "#1b1c1c",
+                    "on-surface-variant": "#504441",
+                    "on-secondary-container": "#795c51",
+                    "surface-container-lowest": "#ffffff"
+                }
+            }
+        }
+    }
+</script>
+<style>
+    .material-symbols-outlined {font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;}
+</style>
+{% endblock %}
+
+{% block content %}
+<main class="flex-1 p-6 md:p-8 overflow-x-hidden max-w-5xl mx-auto">
+    <div class="bg-surface rounded-2xl shadow-[0px_4px_24px_rgba(68,42,34,0.06)] border border-outline-variant overflow-hidden">
+        
+        <div class="p-8 md:p-10 grid grid-cols-1 lg:grid-cols-5 gap-12">
+            
+            <!-- Left Form Area (3 columns) -->
+            <div class="lg:col-span-3">
+                <h1 class="text-3xl font-bold text-primary mb-2">Confirm Your Return</h1>
+                <p class="text-sm text-on-surface-variant mb-8">Please provide your expected arrival details for administrative check-in.</p>
+                
+                <form method="POST" action="{{ url_for('student.return_confirmation', leave_id=leave.id) }}" class="space-y-6">
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div>
+                            <label class="block text-xs font-bold text-on-surface-variant mb-2">Return Date</label>
+                            <div class="relative">
+                                <input type="text" name="return_date" value="{{ leave.to_date }}" class="w-full rounded-xl border-none bg-surface-container-low focus:ring-2 focus:ring-primary text-sm p-4 pr-10 text-on-surface font-medium" readonly>
+                                <span class="material-symbols-outlined absolute right-4 top-4 text-on-surface-variant pointer-events-none">event</span>
+                            </div>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-on-surface-variant mb-2">Expected Arrival Time</label>
+                            <div class="relative">
+                                <input type="time" name="return_time" required class="w-full rounded-xl border-none bg-surface-container-low focus:ring-2 focus:ring-primary text-sm p-4 text-on-surface font-medium">
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div>
+                        <label class="block text-xs font-bold text-on-surface-variant mb-2">Additional Notes (Optional)</label>
+                        <textarea name="return_notes" rows="3" class="w-full rounded-xl border-none bg-surface-container-low focus:ring-2 focus:ring-primary text-sm p-4 text-on-surface placeholder-on-surface-variant/50 resize-none" placeholder="Any delays or specific travel information..."></textarea>
+                    </div>
+                    
+                    <div class="bg-[#ffe5d9] border border-[#ffcdb2] rounded-xl p-4 flex gap-3">
+                        <span class="material-symbols-outlined text-[#d45d3e] shrink-0">info</span>
+                        <p class="text-xs text-[#b84a2d] font-medium leading-relaxed">Late returns after 9:00 PM require prior permission from the hostel warden. Please ensure you carry your ID for verification.</p>
+                    </div>
+                    
+                    <div class="flex items-center gap-4 pt-4">
+                        <button type="submit" class="bg-primary text-white font-bold py-3 px-8 rounded-full hover:bg-primary-container transition-colors shadow-md">Confirm Return</button>
+                        <a href="{{ url_for('student.leave_outpass') }}" class="text-sm font-bold text-primary hover:underline px-4">Cancel Request</a>
+                    </div>
+                </form>
+            </div>
+            
+            <!-- Right Info Area (2 columns) -->
+            <div class="lg:col-span-2 space-y-6">
+                
+                <!-- Menu Preview -->
+                <div class="bg-surface rounded-xl border border-outline-variant overflow-hidden shadow-sm">
+                    <div class="bg-primary text-white p-4 flex justify-between items-center">
+                        <h3 class="font-bold flex items-center gap-2"><span class="material-symbols-outlined">restaurant</span> Menu Preview</h3>
+                        <span class="bg-white/20 px-3 py-1 rounded-full text-[10px] font-semibold">{{ menu.day if menu else 'Today' }}</span>
+                    </div>
+                    <div class="p-6 space-y-6">
+                        {% if menu %}
+                        <div class="flex gap-4">
+                            <div class="w-10 h-10 rounded-lg bg-[#ffe5d9] text-[#d45d3e] flex items-center justify-center shrink-0">
+                                <span class="material-symbols-outlined">light_mode</span>
+                            </div>
+                            <div>
+                                <p class="text-[11px] font-bold text-primary mb-1">Breakfast (07:30 - 09:00)</p>
+                                <p class="text-[11px] text-on-surface-variant leading-relaxed">{{ menu.breakfast }}</p>
+                            </div>
+                        </div>
+                        <div class="flex gap-4">
+                            <div class="w-10 h-10 rounded-lg bg-[#ffcdb2] text-[#d45d3e] flex items-center justify-center shrink-0">
+                                <span class="material-symbols-outlined">wb_sunny</span>
+                            </div>
+                            <div>
+                                <p class="text-[11px] font-bold text-primary mb-1">Lunch (12:30 - 14:00)</p>
+                                <p class="text-[11px] text-on-surface-variant leading-relaxed">{{ menu.lunch }}</p>
+                            </div>
+                        </div>
+                        <div class="flex gap-4">
+                            <div class="w-10 h-10 rounded-lg bg-[#ffdac1] text-[#d45d3e] flex items-center justify-center shrink-0">
+                                <span class="material-symbols-outlined">nights_stay</span>
+                            </div>
+                            <div>
+                                <p class="text-[11px] font-bold text-primary mb-1">Dinner (19:30 - 21:00)</p>
+                                <p class="text-[11px] text-on-surface-variant leading-relaxed">{{ menu.dinner }}</p>
+                            </div>
+                        </div>
+                        {% else %}
+                        <p class="text-sm text-on-surface-variant">Menu not available for today.</p>
+                        {% endif %}
+                        
+                        <div class="pt-4 border-t border-outline-variant/50 text-center">
+                            <a href="{{ url_for('student.food_menu') }}" class="text-[11px] font-bold text-primary hover:underline">View Full Weekly Menu</a>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Hostel Info -->
+                <div class="bg-surface rounded-xl border border-outline-variant p-4 flex items-center gap-4 shadow-sm">
+                    <img src="https://ui-avatars.com/api/?name={{ profile.full_name if profile else 'User' }}&background=442a22&color=fff" alt="Avatar" class="w-10 h-10 rounded-full border border-primary-fixed">
+                    <div>
+                        <p class="text-[11px] font-bold text-primary">{{ profile.college if profile else 'BCWD Hostel' }}</p>
+                        <p class="text-[10px] text-on-surface-variant mt-0.5">Active Leave: <span class="capitalize">{{ leave.leave_type }}</span></p>
+                    </div>
+                </div>
+                
+            </div>
+            
+        </div>
+        
+        <!-- Footer -->
+        <div class="bg-surface-container-low p-6 text-center border-t border-outline-variant">
+            <h4 class="font-bold text-primary text-sm mb-1">BCWD - 1878</h4>
+            <p class="text-[10px] text-on-surface-variant mb-4">ಶ್ರೀ ಬಿ. ಚೌಡರಾಜು ಅವರು, ಹಿಂದುಳಿದ ವರ್ಗಗಳ ಕಲ್ಯಾಣ ಇಲಾಖೆ<br>ವೃತ್ತಿಪರ ಮಹಿಳಾ ವಿದ್ಯಾರ್ಥಿ ನಿಲಯ, ಬಿಜೈ ಪಡೀಲ್</p>
+            <div class="flex justify-center gap-6 text-[10px] font-semibold text-primary">
+                <a href="#" class="hover:underline">Privacy Policy</a>
+                <a href="#" class="hover:underline">Contact Admin</a>
+                <a href="#" class="hover:underline">Terms of Stay</a>
+            </div>
+        </div>
+        
+    </div>
+</main>
+{% endblock %}

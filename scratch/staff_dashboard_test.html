@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard | Staff Portal</title>
+    <!-- Custom Premium Theme -->
+    <link href="/static/css/theme.css" rel="stylesheet">
+    <!-- Google Icons -->
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet">
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
+</head>
+<body>
+    <div class="app-container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <span class="material-symbols-outlined" style="font-size: 40px; color: var(--accent);">restaurant_menu</span>
+                <h2 style="font-size: 1.2rem; margin-top: 0.5rem; letter-spacing: 1px;">BCWD STAFF</h2>
+            </div>
+            <nav class="sidebar-nav">
+                <a href="/staff/dashboard" class="nav-item active">
+                    <span class="material-symbols-outlined nav-icon">dashboard</span>
+                    <span>Dashboard</span>
+                </a>
+                <a href="/staff/students" class="nav-item ">
+                    <span class="material-symbols-outlined nav-icon">groups</span>
+                    <span>Today's Students</span>
+                </a>
+                <a href="/staff/food-menu" class="nav-item ">
+                    <span class="material-symbols-outlined nav-icon">restaurant</span>
+                    <span>Food Menu</span>
+                </a>
+                <a href="/staff/leaves" class="nav-item ">
+                    <span class="material-symbols-outlined nav-icon">event_note</span>
+                    <span>Leave Summary</span>
+                </a>
+                <a href="#" class="nav-item ">
+                    <span class="material-symbols-outlined nav-icon">notifications</span>
+                    <span>Notifications</span>
+                </a>
+                <a href="/staff/profile" class="nav-item ">
+                    <span class="material-symbols-outlined nav-icon">person</span>
+                    <span>My Profile</span>
+                </a>
+            </nav>
+            <div style="padding: 1.5rem; border-top: 1px solid rgba(255,255,255,0.1);">
+                <a href="/logout" class="nav-item" style="color: var(--danger); padding: 0.5rem 1rem;">
+                    <span class="material-symbols-outlined nav-icon">logout</span>
+                    <span>Sign Out</span>
+                </a>
+            </div>
+        </aside>
+
+        <!-- Main Content Area -->
+        <main class="main-content">
+            <!-- Top Header -->
+            <header class="top-header">
+                <h2 class="header-title">Overview</h2>
+                <div style="display: flex; align-items: center; gap: 1rem;">
+                    <div style="text-align: right;">
+                        <div style="font-weight: 600; font-size: 0.9rem;">Staff Member</div>
+                        <div style="font-size: 0.75rem; color: var(--text-muted);">Kitchen Management</div>
+                    </div>
+                    <div style="width: 40px; height: 40px; border-radius: 50%; background: var(--primary-light); color: var(--accent); display: flex; align-items: center; justify-content: center; overflow: hidden;">
+                        
+                            <span class="material-symbols-outlined">soup_kitchen</span>
+                        
+                    </div>
+                </div>
+            </header>
+
+            <!-- Scrollable Content -->
+            <div class="content-wrapper">
+                
+                    
+                        
+                            <div class="badge badge-success" style="display: block; margin-bottom: 1.5rem; padding: 1rem; border-radius: 8px;">Successfully logged in as Staff!</div>
+                        
+                    
+                
+                
+                
+<!-- Four Pillar Operational KPI Stats Row Grid Section -->
+<div class="grid-cols-4" style="margin-bottom: 2rem;">
+    <!-- Metric Card 1: Students Present -->
+    <div class="glass-panel" style="padding: 1.5rem; display: flex; flex-direction: column; justify-content: center; border-bottom: 4px solid var(--success);">
+        <p style="font-size: 0.85rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase;">Students Present <span class="badge badge-success" style="font-size:0.6rem; padding: 0.15rem 0.4rem; float: right;">LIVE</span></p>
+        <h4 style="font-size: 2.5rem; font-weight: 700; color: var(--success); margin-top: 0.5rem;">11<span style="font-size: 1rem; color: var(--text-muted);">/180</span></h4>
+    </div>
+
+    <!-- Metric Card 2: Vegetarian Profiles Split -->
+    <div class="glass-panel" style="padding: 1.5rem; display: flex; flex-direction: column; justify-content: center; border-bottom: 4px solid var(--primary);">
+        <p style="font-size: 0.85rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase;">Veg / Non-Veg</p>
+        <h4 style="font-size: 2rem; font-weight: 700; color: var(--primary); margin-top: 0.5rem;">
+            5<span style="font-size: 1rem; color: var(--success);">V</span>
+            <span style="color: var(--border-color); margin: 0 0.5rem;">|</span>
+            7<span style="font-size: 1rem; color: var(--danger);">NV</span>
+        </h4>
+    </div>
+
+    <!-- Metric Card 3: Students On Leave -->
+    <div class="glass-panel" style="padding: 1.5rem; display: flex; flex-direction: column; justify-content: center; border-bottom: 4px solid var(--warning);">
+        <p style="font-size: 0.85rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase;">Students On Leave</p>
+        <h4 style="font-size: 2.5rem; font-weight: 700; color: var(--warning); margin-top: 0.5rem;">1</h4>
+    </div>
+
+    <!-- Metric Card 4: Meal Dispatch Percent -->
+    <div class="glass-panel" style="padding: 1.5rem; display: flex; flex-direction: column; justify-content: center; border-bottom: 4px solid var(--info);">
+        <p style="font-size: 0.85rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase;">Meal Dispatched</p>
+        <h4 style="font-size: 2.5rem; font-weight: 700; color: var(--info); margin-top: 0.5rem;">92%</h4>
+    </div>
+</div>
+
+<!-- Dual Split Grid Layout Section: Kitchen Preparation Blocks vs Sidebar Status Blocks -->
+<div class="grid-cols-3" style="gap: 2rem;">
+    <!-- Left Main Column Block: Today's Kitchen Preparation Grid Layout (takes 2 columns) -->
+    <div style="grid-column: span 2;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+            <h3 style="font-size: 1.25rem; font-weight: 700; color: var(--primary); display: flex; align-items: center; gap: 0.5rem;">
+                <span class="material-symbols-outlined">skillet</span> Today's Kitchen Preparation
+            </h3>
+            <span style="font-weight: 600; color: var(--text-muted);">October 26, 2026</span>
+        </div>
+        
+        <div class="grid-cols-2" style="gap: 1.5rem;">
+            <!-- Meal Card 1: Breakfast -->
+            <div class="glass-panel" style="padding: 1.5rem;">
+                <div style="display: flex; justify-content: space-between; align-items: flex-start; border-bottom: 1px dashed var(--border-color); padding-bottom: 1rem; margin-bottom: 1rem;">
+                    <div>
+                        <h4 style="font-size: 1.1rem; font-weight: 700; color: var(--primary); margin-bottom: 0.25rem;">Breakfast</h4>
+                        <span style="font-size: 0.85rem; font-weight: 600; color: var(--text-muted);">07:30 AM</span>
+                    </div>
+                    <div style="width: 40px; height: 40px; background: rgba(212,175,55,0.1); border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 1.2rem;">🥞</div>
+                </div>
+                <p style="font-weight: 500; color: var(--text-muted); margin-bottom: 1.5rem;">Idli Vada, Chutney, Sambar</p>
+                <div style="display: flex; justify-content: space-between; align-items: center; font-size: 0.9rem;">
+                    <span style="color: var(--primary);"><strong>138</strong> Plates</span>
+                    <span style="font-weight: 700; color: var(--success);">94% Confirmed</span>
+                </div>
+            </div>
+
+            <!-- Meal Card 2: Lunch -->
+            <div class="glass-panel" style="padding: 1.5rem;">
+                <div style="display: flex; justify-content: space-between; align-items: flex-start; border-bottom: 1px dashed var(--border-color); padding-bottom: 1rem; margin-bottom: 1rem;">
+                    <div>
+                        <h4 style="font-size: 1.1rem; font-weight: 700; color: var(--primary); margin-bottom: 0.25rem;">Lunch</h4>
+                        <span style="font-size: 0.85rem; font-weight: 600; color: var(--text-muted);">01:00 PM</span>
+                    </div>
+                    <div style="width: 40px; height: 40px; background: rgba(212,175,55,0.1); border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 1.2rem;">🍲</div>
+                </div>
+                <p style="font-weight: 500; color: var(--text-muted); margin-bottom: 1.5rem;">Rice, Sambar, Palya, Curd</p>
+                <div style="display: flex; justify-content: space-between; align-items: center; font-size: 0.9rem;">
+                    <span style="color: var(--primary);"><strong>145</strong> Plates</span>
+                    <span style="font-weight: 700; color: var(--success);">98% Confirmed</span>
+                </div>
+            </div>
+
+            <!-- Meal Card 3: Snacks -->
+            <div class="glass-panel" style="padding: 1.5rem;">
+                <div style="display: flex; justify-content: space-between; align-items: flex-start; border-bottom: 1px dashed var(--border-color); padding-bottom: 1rem; margin-bottom: 1rem;">
+                    <div>
+                        <h4 style="font-size: 1.1rem; font-weight: 700; color: var(--primary); margin-bottom: 0.25rem;">Snacks</h4>
+                        <span style="font-size: 0.85rem; font-weight: 600; color: var(--text-muted);">05:00 PM</span>
+                    </div>
+                    <div style="width: 40px; height: 40px; background: rgba(212,175,55,0.1); border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 1.2rem;">☕</div>
+                </div>
+                <p style="font-weight: 500; color: var(--text-muted); margin-bottom: 1.5rem;">Tea/Coffee & Biscuits</p>
+                <div style="display: flex; justify-content: space-between; align-items: center; font-size: 0.9rem;">
+                    <span style="color: var(--primary);"><strong>120</strong> Plates</span>
+                    <span style="font-weight: 700; color: var(--success);">78% Confirmed</span>
+                </div>
+            </div>
+
+            <!-- Meal Card 4: Dinner -->
+            <div class="glass-panel" style="padding: 1.5rem;">
+                <div style="display: flex; justify-content: space-between; align-items: flex-start; border-bottom: 1px dashed var(--border-color); padding-bottom: 1rem; margin-bottom: 1rem;">
+                    <div>
+                        <h4 style="font-size: 1.1rem; font-weight: 700; color: var(--primary); margin-bottom: 0.25rem;">Dinner</h4>
+                        <span style="font-size: 0.85rem; font-weight: 600; color: var(--text-muted);">08:00 PM</span>
+                    </div>
+                    <div style="width: 40px; height: 40px; background: rgba(212,175,55,0.1); border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 1.2rem;">🍛</div>
+                </div>
+                <p style="font-weight: 500; color: var(--text-muted); margin-bottom: 1.5rem;">Ragi Mudde, Banana, Rice Sambar</p>
+                <div style="display: flex; justify-content: space-between; align-items: center; font-size: 0.9rem;">
+                    <span style="color: var(--primary);"><strong>152</strong> Plates</span>
+                    <span style="font-weight: 700; color: var(--success);">82% Confirmed</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Right Sidebar Status Blocks Column Components (1 column) -->
+    <div style="display: flex; flex-direction: column; gap: 1.5rem;">
+        
+        <!-- Attendance Stats Metric Block Area -->
+        <div class="glass-panel" style="padding: 1.5rem;">
+            <h4 style="font-size: 1.1rem; font-weight: 700; color: var(--primary); margin-bottom: 1.5rem; display: flex; align-items: center; gap: 0.5rem;"><span class="material-symbols-outlined">how_to_reg</span> Student Attendance</h4>
+            
+            <div style="margin-bottom: 1.25rem;">
+                <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem; font-size: 0.9rem;">
+                    <span style="font-weight: 600; color: var(--text-muted);">Hostel Capacity (12/180)</span>
+                    <strong style="color: var(--primary);">6%</strong>
+                </div>
+                <div style="height: 6px; background: rgba(0,0,0,0.05); border-radius: 3px; overflow: hidden;">
+                    <div class="dynamic-dashboard-bar" data-width="6" data-bg="var(--primary)" style="height: 100%; border-radius: 3px;"></div>
+                </div>
+            </div>
+
+            <div style="margin-bottom: 1.25rem;">
+                <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem; font-size: 0.9rem;">
+                    <span style="font-weight: 600; color: var(--text-muted);">Veg Preference</span>
+                    <strong style="color: var(--success);">41%</strong>
+                </div>
+                <div style="height: 6px; background: rgba(0,0,0,0.05); border-radius: 3px; overflow: hidden;">
+                    <div class="dynamic-dashboard-bar" data-width="41" data-bg="var(--success)" style="height: 100%; border-radius: 3px;"></div>
+                </div>
+            </div>
+
+            <div>
+                <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem; font-size: 0.9rem;">
+                    <span style="font-weight: 600; color: var(--text-muted);">Today's Attendance</span>
+                    <strong style="color: var(--warning);">91%</strong>
+                </div>
+                <div style="height: 6px; background: rgba(0,0,0,0.05); border-radius: 3px; overflow: hidden;">
+                    <div class="dynamic-dashboard-bar" data-width="91" data-bg="var(--warning)" style="height: 100%; border-radius: 3px;"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Pending Leaves Module List Block Section -->
+        <div class="glass-panel" style="padding: 1.5rem;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+                <h4 style="font-size: 1.1rem; font-weight: 700; color: var(--primary); margin: 0; display: flex; align-items: center; gap: 0.5rem;"><span class="material-symbols-outlined">pending_actions</span> Pending Leaves</h4>
+                <a href="#" style="font-size: 0.8rem; font-weight: 700; color: var(--accent); text-decoration: none;">VIEW ALL</a>
+            </div>
+            
+            <div style="display: flex; flex-direction: column; gap: 1rem;">
+                
+                <div style="display: flex; align-items: center; gap: 1rem; padding: 0.75rem; border: 1px solid rgba(0,0,0,0.05); border-radius: 8px; background: white;">
+                    <div style="width: 36px; height: 36px; border-radius: 50%; background: rgba(212,175,55,0.1); color: var(--accent); display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 0.85rem;">VA</div>
+                    <div style="flex: 1;">
+                        <h5 style="margin: 0; font-size: 0.9rem; font-weight: 700; color: var(--primary);">varshitha</h5>
+                        <p style="margin: 0; font-size: 0.8rem; color: var(--text-muted);">Casual • 13 Jun</p>
+                    </div>
+                    <span class="material-symbols-outlined" style="color: var(--text-muted); font-size: 1.2rem;">chevron_right</span>
+                </div>
+                
+            </div>
+        </div>
+    </div>
+</div>
+
+            </div>
+        </main>
+    </div>
+    
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    document.querySelectorAll('.dynamic-dashboard-bar').forEach(el => {
+        el.style.width = el.getAttribute('data-width') + '%';
+        el.style.background = el.getAttribute('data-bg');
+    });
+});
+</script>
+
+</body>
+</html>

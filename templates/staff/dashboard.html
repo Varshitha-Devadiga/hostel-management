@@ -1,0 +1,197 @@
+{% extends "staff/staff_base.html" %}
+
+{% block title %}Dashboard | Staff Portal{% endblock %}
+{% block extra_js %}
+<script>
+    document.querySelectorAll('.dynamic-dashboard-bar').forEach(el => {
+        el.style.width = el.getAttribute('data-width') + '%';
+        el.style.background = el.getAttribute('data-bg');
+    });
+</script>
+{% endblock %}
+{% block page_title %}Overview{% endblock %}
+
+{% block content %}
+<!-- Four Pillar Operational KPI Stats Row Grid Section -->
+<div style="display: grid; grid-template-columns: repeat(5, 1fr); gap: 1.5rem; margin-bottom: 2rem;">
+    <!-- Metric Card 1: Students Present -->
+    <div class="glass-panel" style="padding: 1.5rem; display: flex; flex-direction: column; justify-content: center; border-bottom: 4px solid var(--success);">
+        <p style="font-size: 0.85rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase;">Students Present <span class="badge badge-success" style="font-size:0.6rem; padding: 0.15rem 0.4rem; float: right;">LIVE</span></p>
+        <h4 style="font-size: 2.5rem; font-weight: 700; color: var(--success); margin-top: 0.5rem;">{{ total_present|default("0") }}<span style="font-size: 1rem; color: var(--text-muted);">/{{ capacity|default("0") }}</span></h4>
+    </div>
+
+    <!-- Metric Card 2: Vegetarian Profiles -->
+    <div class="glass-panel" style="padding: 1.5rem; display: flex; flex-direction: column; justify-content: center; border-bottom: 4px solid var(--primary);">
+        <p style="font-size: 0.85rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase;">Vegetarian</p>
+        <h4 style="font-size: 2.5rem; font-weight: 700; color: var(--primary); margin-top: 0.5rem;">{{ veg_count|default("0") }}</h4>
+    </div>
+
+    <!-- Metric Card 3: Non-Vegetarian Profiles -->
+    <div class="glass-panel" style="padding: 1.5rem; display: flex; flex-direction: column; justify-content: center; border-bottom: 4px solid var(--danger);">
+        <p style="font-size: 0.85rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase;">Non-Veg</p>
+        <h4 style="font-size: 2.5rem; font-weight: 700; color: var(--danger); margin-top: 0.5rem;">{{ nonveg_count|default("0") }}</h4>
+    </div>
+
+    <!-- Metric Card 4: Students On Leave -->
+    <div class="glass-panel" style="padding: 1.5rem; display: flex; flex-direction: column; justify-content: center; border-bottom: 4px solid var(--warning);">
+        <p style="font-size: 0.85rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase;">Students On Leave</p>
+        <h4 style="font-size: 2.5rem; font-weight: 700; color: var(--warning); margin-top: 0.5rem;">{{ leave_count|default("0") }}</h4>
+    </div>
+</div>
+
+<!-- Dual Split Grid Layout Section: Kitchen Preparation Blocks vs Sidebar Status Blocks -->
+<div class="grid-cols-3" style="gap: 2rem;">
+    <!-- Left Main Column Block: Today's Kitchen Preparation Grid Layout (takes 2 columns) -->
+    <div style="grid-column: span 2;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+            <h3 style="font-size: 1.25rem; font-weight: 700; color: var(--primary); display: flex; align-items: center; gap: 0.5rem;">
+                <span class="material-symbols-outlined">skillet</span> Today's Kitchen Preparation
+            </h3>
+            <span style="font-weight: 600; color: var(--text-muted);">{{ today_str if today_str else "Today" }}</span>
+        </div>
+        
+        <div class="grid-cols-2" style="gap: 1.5rem;">
+            <!-- Meal Card 1: Breakfast -->
+            <div class="glass-panel" style="padding: 1.5rem;">
+                <div style="display: flex; justify-content: space-between; align-items: flex-start; border-bottom: 1px dashed var(--border-color); padding-bottom: 1rem; margin-bottom: 1rem;">
+                    <div>
+                        <h4 style="font-size: 1.1rem; font-weight: 700; color: var(--primary); margin-bottom: 0.25rem;">Breakfast</h4>
+                        <span style="font-size: 0.85rem; font-weight: 600; color: var(--text-muted);">07:30 AM</span>
+                    </div>
+                    <div style="width: 40px; height: 40px; background: rgba(212,175,55,0.1); border-radius: 8px; display: flex; align-items: center; justify-content: center; color: var(--primary);"><span class="material-symbols-outlined">coffee</span></div>
+                </div>
+                <p style="font-weight: 500; color: var(--text-muted); margin-bottom: 1.5rem;">{{ today_menu.breakfast if today_menu else "Menu not set" }}</p>
+                <div style="display: flex; justify-content: space-between; align-items: center; font-size: 0.9rem;">
+                    <span style="color: var(--primary);"><strong>{{ expected_breakfast|default("0") }}</strong> Expected</span>
+                </div>
+            </div>
+
+            <!-- Meal Card 2: Lunch -->
+            <div class="glass-panel" style="padding: 1.5rem;">
+                <div style="display: flex; justify-content: space-between; align-items: flex-start; border-bottom: 1px dashed var(--border-color); padding-bottom: 1rem; margin-bottom: 1rem;">
+                    <div>
+                        <h4 style="font-size: 1.1rem; font-weight: 700; color: var(--primary); margin-bottom: 0.25rem;">Lunch</h4>
+                        <span style="font-size: 0.85rem; font-weight: 600; color: var(--text-muted);">01:00 PM</span>
+                    </div>
+                    <div style="width: 40px; height: 40px; background: rgba(212,175,55,0.1); border-radius: 8px; display: flex; align-items: center; justify-content: center; color: var(--primary);"><span class="material-symbols-outlined">restaurant</span></div>
+                </div>
+                <p style="font-weight: 500; color: var(--text-muted); margin-bottom: 1.5rem;">{{ today_menu.lunch if today_menu else "Menu not set" }}</p>
+                <div style="display: flex; justify-content: space-between; align-items: center; font-size: 0.9rem;">
+                    <span style="color: var(--primary);"><strong>{{ expected_lunch|default("0") }}</strong> Expected</span>
+                </div>
+            </div>
+
+            <!-- Meal Card 3: Snacks -->
+            <div class="glass-panel" style="padding: 1.5rem;">
+                <div style="display: flex; justify-content: space-between; align-items: flex-start; border-bottom: 1px dashed var(--border-color); padding-bottom: 1rem; margin-bottom: 1rem;">
+                    <div>
+                        <h4 style="font-size: 1.1rem; font-weight: 700; color: var(--primary); margin-bottom: 0.25rem;">Snacks</h4>
+                        <span style="font-size: 0.85rem; font-weight: 600; color: var(--text-muted);">05:00 PM</span>
+                    </div>
+                    <div style="width: 40px; height: 40px; background: rgba(212,175,55,0.1); border-radius: 8px; display: flex; align-items: center; justify-content: center; color: var(--primary);"><span class="material-symbols-outlined">bakery_dining</span></div>
+                </div>
+                <p style="font-weight: 500; color: var(--text-muted); margin-bottom: 1.5rem;">{{ today_menu.snacks if today_menu else "Menu not set" }}</p>
+                <div style="display: flex; justify-content: space-between; align-items: center; font-size: 0.9rem;">
+                    <span style="color: var(--primary);"><strong>{{ expected_snacks|default("0") }}</strong> Expected</span>
+                </div>
+            </div>
+
+            <!-- Meal Card 4: Dinner -->
+            <div class="glass-panel" style="padding: 1.5rem;">
+                <div style="display: flex; justify-content: space-between; align-items: flex-start; border-bottom: 1px dashed var(--border-color); padding-bottom: 1rem; margin-bottom: 1rem;">
+                    <div>
+                        <h4 style="font-size: 1.1rem; font-weight: 700; color: var(--primary); margin-bottom: 0.25rem;">Dinner</h4>
+                        <span style="font-size: 0.85rem; font-weight: 600; color: var(--text-muted);">08:00 PM</span>
+                    </div>
+                    <div style="width: 40px; height: 40px; background: rgba(212,175,55,0.1); border-radius: 8px; display: flex; align-items: center; justify-content: center; color: var(--primary);"><span class="material-symbols-outlined">dinner_dining</span></div>
+                </div>
+                <p style="font-weight: 500; color: var(--text-muted); margin-bottom: 1.5rem;">{{ today_menu.dinner if today_menu else "Menu not set" }}</p>
+                <div style="display: flex; justify-content: space-between; align-items: center; font-size: 0.9rem;">
+                    <span style="color: var(--primary);"><strong>{{ expected_dinner|default("0") }}</strong> Expected</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Right Sidebar Status Blocks Column Components (1 column) -->
+    <div style="display: flex; flex-direction: column; gap: 1.5rem;">
+        
+        <!-- Shift Check-In Block -->
+        <div class="glass-panel" style="padding: 1.5rem; text-align: center; border-bottom: 4px solid {% if current_user.staff_profile.status == 'On Duty' %}var(--success){% else %}var(--warning){% endif %};">
+            <h4 style="font-size: 1.1rem; font-weight: 700; color: var(--primary); margin-bottom: 1rem; display: flex; align-items: center; justify-content: center; gap: 0.5rem;"><span class="material-symbols-outlined">schedule</span> Shift Status</h4>
+            <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 1.5rem;">Click the button below when you arrive or leave for your alternating shift.</p>
+            
+            <form action="{{ url_for('staff.shift_toggle') }}" method="POST">
+                {% if current_user.staff_profile.status == 'On Duty' %}
+                <button type="submit" class="btn btn-primary" style="width: 100%; display: flex; align-items: center; justify-content: center; gap: 0.5rem; background: var(--danger); border-color: var(--danger);">
+                    <span class="material-symbols-outlined">logout</span> Check-Out (End Shift)
+                </button>
+                <div style="margin-top: 1rem; font-size: 0.9rem; font-weight: 700; color: var(--success);"><span class="material-symbols-outlined" style="font-size: 14px; vertical-align: text-bottom;">radio_button_checked</span> You are currently ON DUTY</div>
+                {% else %}
+                <button type="submit" class="btn btn-primary" style="width: 100%; display: flex; align-items: center; justify-content: center; gap: 0.5rem; background: var(--success); border-color: var(--success);">
+                    <span class="material-symbols-outlined">login</span> Check-In (Start Shift)
+                </button>
+                <div style="margin-top: 1rem; font-size: 0.9rem; font-weight: 700; color: var(--warning);"><span class="material-symbols-outlined" style="font-size: 14px; vertical-align: text-bottom;">radio_button_unchecked</span> You are currently OFF DUTY</div>
+                {% endif %}
+            </form>
+        </div>
+
+        <!-- Attendance Stats Metric Block Area -->
+        <div class="glass-panel" style="padding: 1.5rem;">
+            <h4 style="font-size: 1.1rem; font-weight: 700; color: var(--primary); margin-bottom: 1.5rem; display: flex; align-items: center; gap: 0.5rem;"><span class="material-symbols-outlined">how_to_reg</span> Student Attendance</h4>
+            
+            <div style="margin-bottom: 1.25rem;">
+                <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem; font-size: 0.9rem;">
+                    <span style="font-weight: 600; color: var(--text-muted);">Hostel Capacity ({{ total_students }}/{{ capacity }})</span>
+                    <strong style="color: var(--primary);">{{ capacity_percent }}%</strong>
+                </div>
+                <div style="height: 6px; background: rgba(0,0,0,0.05); border-radius: 3px; overflow: hidden;">
+                    <div class="dynamic-dashboard-bar" data-width="{{ capacity_percent }}" data-bg="var(--primary)" style="height: 100%; border-radius: 3px;"></div>
+                </div>
+            </div>
+
+            <div style="margin-bottom: 1.25rem;">
+                <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem; font-size: 0.9rem;">
+                    <span style="font-weight: 600; color: var(--text-muted);">Veg Preference</span>
+                    <strong style="color: var(--success);">{{ veg_percent }}%</strong>
+                </div>
+                <div style="height: 6px; background: rgba(0,0,0,0.05); border-radius: 3px; overflow: hidden;">
+                    <div class="dynamic-dashboard-bar" data-width="{{ veg_percent }}" data-bg="var(--success)" style="height: 100%; border-radius: 3px;"></div>
+                </div>
+            </div>
+
+            <div>
+                <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem; font-size: 0.9rem;">
+                    <span style="font-weight: 600; color: var(--text-muted);">Today's Attendance</span>
+                    <strong style="color: var(--warning);">{{ attendance_percent }}%</strong>
+                </div>
+                <div style="height: 6px; background: rgba(0,0,0,0.05); border-radius: 3px; overflow: hidden;">
+                    <div class="dynamic-dashboard-bar" data-width="{{ attendance_percent }}" data-bg="var(--warning)" style="height: 100%; border-radius: 3px;"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Pending Leaves Module List Block Section -->
+        <div class="glass-panel" style="padding: 1.5rem;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+                <h4 style="font-size: 1.1rem; font-weight: 700; color: var(--primary); margin: 0; display: flex; align-items: center; gap: 0.5rem;"><span class="material-symbols-outlined">pending_actions</span> Pending Leaves</h4>
+            </div>
+            
+            <div style="display: flex; flex-direction: column; gap: 1rem;">
+                {% for leave in pending_leaves %}
+                <a href="{{ url_for('staff.leave_summary') }}" style="text-decoration: none; display: flex; align-items: center; gap: 1rem; padding: 0.75rem; border: 1px solid rgba(0,0,0,0.05); border-radius: 8px; background: white; transition: transform 0.2s, box-shadow 0.2s;" onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 4px 12px rgba(0,0,0,0.05)';" onmouseout="this.style.transform='none'; this.style.boxShadow='none';">
+                    <div style="width: 36px; height: 36px; border-radius: 50%; background: rgba(212,175,55,0.1); color: var(--accent); display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 0.85rem;">{{ leave.user.student_profile.full_name[:2].upper() if leave.user and leave.user.student_profile else '?' }}</div>
+                    <div style="flex: 1;">
+                        <h5 style="margin: 0; font-size: 0.9rem; font-weight: 700; color: var(--primary);">{{ leave.user.student_profile.full_name if leave.user and leave.user.student_profile else 'Unknown Student' }}</h5>
+                        <p style="margin: 0; font-size: 0.8rem; color: var(--text-muted);">{{ leave.leave_type.replace('_', ' ').title() }} • {{ leave.from_date.strftime('%d %b') }}</p>
+                    </div>
+                    <span class="material-symbols-outlined" style="color: var(--text-muted); font-size: 1.2rem;">chevron_right</span>
+                </a>
+                {% else %}
+                <p style="font-size: 0.9rem; color: var(--text-muted); text-align: center;">No pending leaves to approve.</p>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

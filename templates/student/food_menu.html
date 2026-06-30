@@ -1,0 +1,126 @@
+{% extends "student/student_base.html" %}
+{% block title %}Food Menu | BCWD{% endblock %}
+{% block page_title %}Food Menu{% endblock %}
+
+{% block extra_head %}
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet">
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script>
+    tailwind.config = {
+        darkMode: "class",
+        theme: {
+            extend: {
+                "colors": {
+                    "primary-fixed": "#ffdbd0",
+                    "surface-container": "#f0eded",
+                    "surface-container-high": "#eae8e7",
+                    "primary-container": "#5d4037",
+                    "secondary-container": "#fed7ca",
+                    "secondary": "#75584d",
+                    "surface": "#fbf9f8",
+                    "on-primary": "#ffffff",
+                    "on-primary-container": "#d4ada1",
+                    "surface-container-low": "#f5f3f3",
+                    "error-container": "#ffdad6",
+                    "primary": "#442a22",
+                    "on-error": "#ffffff",
+                    "background": "#fbf9f8",
+                    "outline": "#827470",
+                    "outline-variant": "#d4c3be",
+                    "on-surface": "#1b1c1c",
+                    "on-surface-variant": "#504441",
+                    "on-secondary-container": "#795c51",
+                    "surface-container-lowest": "#ffffff"
+                }
+            }
+        }
+    }
+</script>
+<style>
+    .material-symbols-outlined {font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;}
+    :root {
+        --primary: #442a22;
+        --text-muted: #827470;
+        --border-color: #d4c3be;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<main class="flex-1 p-6 md:p-8 overflow-x-hidden max-w-6xl mx-auto">
+    <!-- Header -->
+    <div class="flex items-center gap-3 mb-8">
+        <a href="{{ url_for('student.dashboard') }}" class="p-2 hover:bg-surface-container rounded-full transition-colors text-on-surface-variant">
+            <span class="material-symbols-outlined">arrow_back</span>
+        </a>
+        <h1 class="text-3xl font-bold text-primary">Food Menu</h1>
+    </div>
+
+    <!-- Featured Today -->
+    <div class="mb-10">
+        <h2 class="text-xl font-bold text-primary mb-4 flex items-center gap-2"><span class="material-symbols-outlined text-[#b84a2d]">today</span> Today's Menu ({{ today_str }})</h2>
+        <div class="bg-surface rounded-2xl shadow-lg border-2 border-[#d4c3be] overflow-hidden">
+            <div class="bg-[#442a22] text-white p-4 flex items-center justify-between">
+                <span class="font-bold tracking-wider uppercase">{{ today_str }}</span>
+                <span class="bg-[#b84a2d] text-white text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider">Current</span>
+            </div>
+            <div class="p-6 grid grid-cols-2 md:grid-cols-4 gap-6">
+                <div>
+                    <p class="text-xs text-[#827470] font-bold uppercase tracking-wider mb-1">Breakfast</p>
+                    <p class="font-bold text-lg text-[#442a22]">{{ weekly_menu[today_str]['breakfast'] }}</p>
+                </div>
+                <div>
+                    <p class="text-xs text-[#827470] font-bold uppercase tracking-wider mb-1">Lunch</p>
+                    <p class="font-bold text-lg text-[#442a22]">{{ weekly_menu[today_str]['lunch'] }}</p>
+                </div>
+                <div>
+                    <p class="text-xs text-[#827470] font-bold uppercase tracking-wider mb-1">Snacks</p>
+                    <p class="font-bold text-lg text-[#442a22]">{{ weekly_menu[today_str]['snacks'] }}</p>
+                </div>
+                <div>
+                    <p class="text-xs text-[#827470] font-bold uppercase tracking-wider mb-1">Dinner</p>
+                    <p class="font-bold text-lg text-[#442a22]">{{ weekly_menu[today_str]['dinner'] }}</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Rest of the Week -->
+    <div class="bg-surface rounded-xl p-6 shadow-sm border border-[#d4c3be]">
+        <h3 class="text-lg font-bold text-[#442a22] mb-6">Full Weekly Menu</h3>
+        <div class="flex flex-col gap-4">
+            
+            {% for day, meals in weekly_menu.items() %}
+            <div class="rounded-xl overflow-hidden border {{ 'border-[#442a22] shadow-md ring-1 ring-[#442a22]' if day == today_str else 'border-[#d4c3be]' }} flex flex-col md:flex-row">
+                <div class="p-4 flex items-center justify-center min-w-[160px] font-bold text-sm tracking-wider uppercase {{ 'bg-[#442a22] text-white' if day == today_str else 'bg-[#eae8e7] text-[#442a22]' }}">
+                    <div class="flex flex-col items-center">
+                        {{ day }}
+                        {% if day == today_str %} <span class="mt-1.5 text-[10px] bg-white text-[#442a22] px-2 py-0.5 rounded-full shadow-sm">TODAY</span> {% endif %}
+                    </div>
+                </div>
+                <div class="p-5 grid grid-cols-2 lg:grid-cols-4 gap-6 flex-1 bg-white">
+                    <div>
+                        <p class="text-[10px] text-[#827470] font-bold uppercase tracking-wider mb-1">Breakfast</p>
+                        <p class="text-sm font-semibold text-[#1b1c1c]">{{ meals['breakfast'] }}</p>
+                    </div>
+                    <div>
+                        <p class="text-[10px] text-[#827470] font-bold uppercase tracking-wider mb-1">Lunch</p>
+                        <p class="text-sm font-semibold text-[#1b1c1c]">{{ meals['lunch'] }}</p>
+                    </div>
+                    <div>
+                        <p class="text-[10px] text-[#827470] font-bold uppercase tracking-wider mb-1">Snacks</p>
+                        <p class="text-sm font-semibold text-[#1b1c1c]">{{ meals['snacks'] }}</p>
+                    </div>
+                    <div>
+                        <p class="text-[10px] text-[#827470] font-bold uppercase tracking-wider mb-1">Dinner</p>
+                        <p class="text-sm font-semibold text-[#1b1c1c]">{{ meals['dinner'] }}</p>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+            
+        </div>
+    </div>
+</main>
+{% endblock %}

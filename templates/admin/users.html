@@ -1,0 +1,166 @@
+{% extends "admin/admin_base.html" %}
+
+{% block title %}Student Management | BCWD{% endblock %}
+{% block page_title %}Total Students in Hostel{% endblock %}
+
+{% block content %}
+<style>
+    .kpi-card {
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+    .kpi-card:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 8px 24px rgba(0,0,0,0.08) !important;
+    }
+</style>
+<div class="grid-cols-4" style="margin-bottom: 2rem;">
+    <div class="glass-panel kpi-card" onclick="filterTable('all')" style="padding: 1.5rem; display: flex; flex-direction: column; justify-content: center; cursor: pointer; border-bottom: 4px solid var(--primary);">
+        <p style="font-size: 0.85rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase;">Total Students</p>
+        <h4 style="font-size: 2.5rem; font-weight: 700; color: var(--primary); margin-top: 0.5rem;">{{ total_students|default(0) }}</h4>
+    </div>
+    <div class="glass-panel kpi-card" onclick="filterTable('present')" style="padding: 1.5rem; display: flex; flex-direction: column; justify-content: center; border-bottom: 4px solid var(--success); cursor: pointer;">
+        <p style="font-size: 0.85rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase;">Present Today</p>
+        <h4 style="font-size: 2.5rem; font-weight: 700; color: var(--success); margin-top: 0.5rem;">{{ present_today|default(0) }}</h4>
+    </div>
+    <div class="glass-panel kpi-card" onclick="filterTable('leave')" style="padding: 1.5rem; display: flex; flex-direction: column; justify-content: center; border-bottom: 4px solid var(--warning); cursor: pointer;">
+        <p style="font-size: 0.85rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase;">On Leave</p>
+        <h4 style="font-size: 2.5rem; font-weight: 700; color: var(--warning); margin-top: 0.5rem;">{{ on_leave_today|default(0) }}</h4>
+    </div>
+    <div class="glass-panel kpi-card" onclick="filterTable('pending')" style="padding: 1.5rem; display: flex; flex-direction: column; justify-content: center; border-bottom: 4px solid var(--info); cursor: pointer;">
+        <p style="font-size: 0.85rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase;">Pending Req</p>
+        <h4 style="font-size: 2.5rem; font-weight: 700; color: var(--info); margin-top: 0.5rem;">{{ pending_reg|default(0) }}</h4>
+    </div>
+</div>
+
+<div class="glass-panel" style="padding: 1.5rem; margin-bottom: 2rem; display: flex; gap: 1rem; align-items: center; flex-wrap: wrap;">
+    <input type="text" id="searchInput" onkeyup="searchTable()" placeholder="Search by name..." class="form-control" style="flex: 1; min-width: 250px; background: rgba(0,0,0,0.02);" />
+    <select class="form-control" style="width: auto; background: rgba(0,0,0,0.02);"><option>All Courses</option></select>
+    <select class="form-control" style="width: auto; background: rgba(0,0,0,0.02);"><option>2023-24</option></select>
+    
+    {% if 'export_students' in url_for.__globals__ %}
+    <a href="{{ url_for('admin.export_students') }}" class="btn-outline" style="display: flex; align-items: center; gap: 0.5rem;">
+        <span class="material-symbols-outlined" style="font-size: 20px;">download</span> Export CSV
+    </a>
+    {% endif %}
+    <button class="btn-premium">Register Student</button>
+</div>
+
+<h3 id="table-heading" style="font-size: 1.2rem; color: var(--primary); font-weight: 700; border-bottom: 2px solid var(--border-color); padding-bottom: 0.5rem; margin-bottom: 1.5rem;">Hostel Directory & Registration Approvals</h3>
+
+<div class="glass-panel" style="padding: 0; overflow: hidden;">
+    <div style="overflow-x: auto;">
+        <table class="premium-table" id="studentsTable">
+            <thead>
+                <tr>
+                    <th>STUDENT PROFILE</th>
+                    <th>COURSE</th>
+                    <th>ROOM</th>
+                    <th>FOOD PREP</th>
+                    <th>STATUS</th>
+                    <th style="text-align: right;">ACTIONS</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for student in students %}
+                {% set is_on_leave = student.user_id in on_leave_user_ids %}
+                <tr class="student-row" data-status="{{ student.status }}" data-leave="{{ 'yes' if is_on_leave else 'no' }}" style="display: {{ '' if student.status == 'Verified' else 'none' }};">
+                      <td style="font-weight: 700; color: var(--primary);">
+                          <a href="{{ url_for('admin.view_student', id=student.id) }}" style="text-decoration: none; color: inherit; display: inline-flex; align-items: center; gap: 1rem; transition: transform 0.2s; padding: 0.25rem; border-radius: 8px;" onmouseover="this.style.background='rgba(0,0,0,0.03)'" onmouseout="this.style.background='transparent'">
+                              <div style="width: 36px; height: 36px; border-radius: 50%; background: var(--primary-light); color: var(--accent); display: flex; align-items: center; justify-content: center; font-size: 0.85rem;">
+                                  {{ student.full_name[0] }}
+                              </div>
+                              <span class="student-name">{{ student.full_name }}</span>
+                          </a>
+                      </td>
+                      <td>
+                          <div style="font-size: 0.9rem; font-weight: 500;">{{ student.course }}</div>
+                      </td>
+                    <td style="color: var(--text-muted); font-style: italic;">Unassigned</td>
+                    <td>
+                        <span style="display: inline-flex; align-items: center; gap: 0.5rem; font-size: 0.85rem; font-weight: 600; color: var(--info);">
+                            <span style="width: 8px; height: 8px; border-radius: 50%; background: var(--info);"></span> Vegetarian
+                        </span>
+                    </td>
+                    <td>
+                        {% if student.status == 'Verified' %}
+                            <span class="badge badge-success">VERIFIED</span>
+                        {% elif student.status == 'Pending Review' or student.status == 'Pending' %}
+                            <span class="badge badge-warning">{{ student.status|upper }}</span>
+                        {% else %}
+                            <span class="badge badge-danger">{{ student.status|upper }}</span>
+                        {% endif %}
+                    </td>
+                    <td style="text-align: right;">
+                        <div style="display: flex; justify-content: flex-end; gap: 0.5rem;">
+                            {% if student.status != 'Verified' %}
+                            <a href="{{ url_for('admin.approve_student', id=student.id) }}" style="padding: 0.25rem 0.75rem; border-radius: 6px; background: rgba(40,167,69,0.1); color: var(--success); font-size: 0.85rem; font-weight: 600;">Approve</a>
+                            {% endif %}
+                            <a href="{{ url_for('admin.delete_student', id=student.id) }}" onclick="return confirm('Delete this record?');" style="padding: 0.25rem 0.75rem; border-radius: 6px; background: rgba(220,53,69,0.1); color: var(--danger); font-size: 0.85rem; font-weight: 600;">Delete</a>
+                        </div>
+                    </td>
+                </tr>
+                {% else %}
+                <tr>
+                    <td colspan="6" style="text-align: center; padding: 3rem; color: var(--text-muted);">No students found in the database.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+function searchTable() {
+    var input, filter, table, tr, td, i, txtValue;
+    input = document.getElementById("searchInput");
+    filter = input.value.toUpperCase();
+    table = document.getElementById("studentsTable");
+    tr = table.getElementsByClassName("student-row");
+
+    for (i = 0; i < tr.length; i++) {
+        td = tr[i].getElementsByClassName("student-name")[0];
+        if (td) {
+            txtValue = td.textContent || td.innerText;
+            if (txtValue.toUpperCase().indexOf(filter) > -1) {
+                tr[i].style.display = "";
+            } else {
+                tr[i].style.display = "none";
+            }
+        }
+    }
+}
+
+function filterTable(type) {
+    var table = document.getElementById("studentsTable");
+    var tr = table.getElementsByClassName("student-row");
+    var heading = document.getElementById("table-heading");
+
+    if (heading) {
+        if (type === 'all') heading.innerText = "Hostel Directory & Registration Approvals";
+        else if (type === 'present') heading.innerText = "Students Present Today";
+        else if (type === 'leave') heading.innerText = "Students Currently On Leave";
+        else if (type === 'pending') heading.innerText = "Pending Registration Approvals";
+    }
+
+    for (var i = 0; i < tr.length; i++) {
+        var status = tr[i].getAttribute("data-status");
+        var leave = tr[i].getAttribute("data-leave");
+        
+        var show = false;
+        if (type === 'all') {
+            show = (status === 'Verified');
+        } else if (type === 'present') {
+            show = (status === 'Verified' && leave === 'no');
+        } else if (type === 'leave') {
+            show = (status === 'Verified' && leave === 'yes');
+        } else if (type === 'pending') {
+            show = (status !== 'Verified');
+        }
+        
+        tr[i].style.display = show ? "" : "none";
+    }
+}
+</script>
+{% endblock %}

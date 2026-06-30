@@ -1,0 +1,159 @@
+{% extends "student/student_base.html" %}
+{% block title %}Student Dashboard | BCWD{% endblock %}
+{% block page_title %}Dashboard{% endblock %}
+
+{% block content %}
+    <!-- Smart Alert Engine (Student-Side) -->
+    {% set is_higher_sem = False %}
+    {% if profile and profile.semester and profile.semester.isdigit() and profile.semester|int > 1 %}
+        {% set is_higher_sem = True %}
+    {% endif %}
+
+    {% set has_marks_cards = False %}
+    {% if current_user.marks_cards.count() > 0 %}
+        {% set has_marks_cards = True %}
+    {% endif %}
+
+    {% if is_higher_sem and not has_marks_cards %}
+    <div style="background: #f8d7da; border-left: 5px solid #dc3545; padding: 1.5rem; margin-bottom: 2rem; border-radius: 8px; display: flex; align-items: flex-start; gap: 1rem; box-shadow: 0 4px 6px rgba(220,53,69,0.1);">
+        <span class="material-symbols-outlined" style="font-size: 32px; color: #dc3545;">error</span>
+        <div>
+            <h3 style="margin: 0 0 0.5rem 0; color: #721c24; font-weight: 700;">🚨 Action Required: Incomplete Academic Profile</h3>
+            <p style="margin: 0 0 1rem 0; color: #721c24; font-size: 1rem;">You have completed at least 1 semester, but your preceding semester Marks Cards are missing from your official record. Please upload them immediately to keep your hostel allotment active.</p>
+            <a href="{{ url_for('student.marks_cards') }}" class="btn-premium" style="background: #dc3545; display: inline-flex; align-items: center; gap: 0.5rem; text-decoration: none; padding: 0.5rem 1rem; border-radius: 6px;">
+                <span class="material-symbols-outlined" style="font-size: 18px;">upload_file</span> Upload Marks Cards Now
+            </a>
+        </div>
+    </div>
+    {% endif %}
+    <!-- Welcome Banner -->
+    <div style="background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%); color: var(--text-inverse); padding: 3rem 2rem; border-radius: 16px; margin-bottom: 2rem; position: relative; overflow: hidden; box-shadow: var(--shadow-lg);">
+        <div style="position: relative; z-index: 10;">
+            <h1 style="font-size: 2.5rem; font-weight: 700; margin-bottom: 0.5rem; color: var(--accent);">
+                Welcome, {{ profile.full_name if profile else 'Student' }}!
+            </h1>
+            <p style="font-size: 1.1rem; opacity: 0.9;">
+                Manage your hostel account and application status.
+            </p>
+        </div>
+        <div style="position: absolute; right: -2rem; bottom: -3rem; opacity: 0.1;">
+            <span class="material-symbols-outlined" style="font-size: 250px;">account_circle</span>
+        </div>
+    </div>
+
+    <!-- Stats Grid -->
+    <div class="grid-cols-3" style="margin-bottom: 2rem;">
+        <div class="glass-panel" style="display: flex; align-items: center; gap: 1.5rem; padding: 1.5rem;">
+            <div style="width: 50px; height: 50px; border-radius: 50%; background: rgba(212, 175, 55, 0.1); color: var(--accent); display: flex; align-items: center; justify-content: center;">
+                <span class="material-symbols-outlined" style="font-size: 28px;">school</span>
+            </div>
+            <div>
+                <p style="font-size: 0.85rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase;">Semester</p>
+                <p style="font-size: 1.25rem; font-weight: 700; color: var(--primary);">Sem {{ profile.semester if profile else 'N/A' }} ({{ profile.admission_year if profile else 'N/A' }})</p>
+            </div>
+        </div>
+        
+        <div class="glass-panel" style="display: flex; align-items: center; gap: 1.5rem; padding: 1.5rem;">
+            <div style="width: 50px; height: 50px; border-radius: 50%; background: rgba(212, 175, 55, 0.1); color: var(--accent); display: flex; align-items: center; justify-content: center;">
+                <span class="material-symbols-outlined" style="font-size: 28px;">restaurant</span>
+            </div>
+            <div>
+                <p style="font-size: 0.85rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase;">Next Meal ({{ next_meal_name }})</p>
+                <p style="font-size: 1.25rem; font-weight: 700; color: var(--primary);">{{ next_meal_food if next_meal_food else 'Menu Not Set' }}</p>
+            </div>
+        </div>
+
+        <a href="{{ url_for('student.leave_outpass') }}" style="text-decoration: none; color: inherit; display: block;">
+            <div class="glass-panel" style="display: flex; align-items: center; gap: 1.5rem; padding: 1.5rem; height: 100%;">
+                <div style="width: 50px; height: 50px; border-radius: 50%; background: rgba(212, 175, 55, 0.1); color: var(--accent); display: flex; align-items: center; justify-content: center;">
+                    <span class="material-symbols-outlined" style="font-size: 28px;">assignment</span>
+                </div>
+                <div>
+                    <p style="font-size: 0.85rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase;">Active Leaves</p>
+                    <p style="font-size: 1.25rem; font-weight: 700; color: var(--primary);">{{ pending_leaves if pending_leaves is defined else '0' }} Pending</p>
+                </div>
+            </div>
+        </a>
+    </div>
+
+    <!-- Main Content Layout -->
+    <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 2rem;">
+        <div style="display: flex; flex-direction: column; gap: 2rem;">
+            
+            <!-- Karnataka Govt SSP Portal Link -->
+            <div style="background: linear-gradient(135deg, #1e3c72, #2a5298); color: white; border-radius: 1rem; padding: 1.5rem; margin-bottom: 2rem; box-shadow: 0 4px 15px rgba(30, 60, 114, 0.2); position: relative; overflow: hidden; display: flex; align-items: center; justify-content: space-between;">
+                <div style="flex: 1; z-index: 2;">
+                    <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.5rem;">
+                        <span class="material-symbols-outlined" style="color: #ffd700;">account_balance</span>
+                        <span style="font-weight: 700; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 1px; color: #ffd700;">ಕರ್ನಾಟಕ ಸರ್ಕಾರ (Govt. of Karnataka)</span>
+                    </div>
+                    <h3 style="margin: 0 0 0.25rem 0; font-size: 1.25rem; font-weight: 700;">State Scholarship Portal (SSP)</h3>
+                    <p style="margin: 0 0 1rem 0; font-size: 0.9rem; opacity: 0.9;">Apply for Pre-Matric and Post-Matric Scholarships.</p>
+                    <a href="https://ssp.karnataka.gov.in/" target="_blank" style="display: inline-flex; align-items: center; gap: 0.5rem; background: white; color: #1e3c72; text-decoration: none; padding: 0.5rem 1rem; border-radius: 2rem; font-weight: 700; font-size: 0.9rem; transition: transform 0.2s;">
+                        Visit SSP Portal <span class="material-symbols-outlined" style="font-size: 1rem;">open_in_new</span>
+                    </a>
+                </div>
+                <div style="position: absolute; right: -2rem; top: -2rem; opacity: 0.1; z-index: 1;">
+                    <span class="material-symbols-outlined" style="font-size: 150px;">school</span>
+                </div>
+            </div>
+
+            <!-- Hostel Updates -->
+            <div class="glass-panel" style="padding: 2rem;">
+                <h3 style="font-size: 1.5rem; color: var(--primary); margin-bottom: 1.5rem; display: flex; align-items: center; gap: 0.5rem; border-bottom: 1px solid var(--border-color); padding-bottom: 0.5rem;">
+                    <span class="material-symbols-outlined">campaign</span> Today's Hostel Updates
+                </h3>
+
+                <a href="{{ url_for('student.notifications') }}" style="text-decoration: none; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 2rem 1rem; text-align: center; background: rgba(212, 175, 55, 0.05); border-radius: 12px; border: 1px dashed var(--accent); transition: all 0.3s ease;" onmouseover="this.style.background='rgba(212, 175, 55, 0.1)'" onmouseout="this.style.background='rgba(212, 175, 55, 0.05)'">
+                <span class="material-symbols-outlined" style="font-size: 36px; color: var(--accent); margin-bottom: 0.5rem;">notifications_active</span>
+                <p style="font-size: 1.1rem; font-weight: 700; color: var(--primary);">Hostel Notifications</p>
+                <p style="color: var(--text-muted); opacity: 0.9; font-size: 0.9rem; margin-top: 0.5rem;">View hostel notices and mess updates.</p>
+            </a>
+        </div>
+        
+        <div style="display: flex; flex-direction: column; gap: 2rem;">
+            <!-- Daily Meal RSVP -->
+            <div class="glass-panel" style="padding: 2rem; border-left: 4px solid var(--accent);">
+                <h3 style="font-size: 1.5rem; color: var(--primary); margin-bottom: 1rem; display: flex; align-items: center; gap: 0.5rem; border-bottom: 1px solid var(--border-color); padding-bottom: 0.5rem;">
+                    <span class="material-symbols-outlined">restaurant</span> Daily Meal RSVP
+                </h3>
+                <p style="font-size: 0.9rem; color: var(--text-muted); margin-bottom: 1.5rem;">
+                    If you are going to skip a meal today (e.g., you are at college during lunch), please uncheck it below so the kitchen knows exactly how much food to prepare!
+                </p>
+                <form method="POST" action="{{ url_for('student.dashboard') }}">
+                    <style>
+                        .meal-checkbox { display: flex; align-items: center; gap: 0.75rem; cursor: pointer; padding: 0.5rem; background: rgba(0,0,0,0.02); border-radius: 8px; }
+                        .meal-checkbox.locked { cursor: not-allowed; opacity: 0.6; }
+                    </style>
+                    <div style="display: flex; flex-direction: column; gap: 1rem; margin-bottom: 1.5rem;">
+                        <label class="meal-checkbox {% if current_hour >= 6 %}locked{% endif %}">
+                            <input type="checkbox" name="breakfast" value="1" {% if rsvp.eating_breakfast %}checked{% endif %} {% if current_hour >= 6 %}disabled{% endif %} style="width: 1.2rem; height: 1.2rem; accent-color: var(--primary);">
+                            <span style="font-weight: 600; color: var(--text-color);">Breakfast (Locks at 6 AM)</span>
+                            {% if current_hour >= 6 %}<span style="font-size: 0.75rem; color: var(--text-muted); margin-left: auto; font-style: italic;">Locked</span>{% endif %}
+                        </label>
+                        <label class="meal-checkbox {% if current_hour >= 10 %}locked{% endif %}">
+                            <input type="checkbox" name="lunch" value="1" {% if rsvp.eating_lunch %}checked{% endif %} {% if current_hour >= 10 %}disabled{% endif %} style="width: 1.2rem; height: 1.2rem; accent-color: var(--primary);">
+                            <span style="font-weight: 600; color: var(--text-color);">Lunch (Locks at 10 AM)</span>
+                            {% if current_hour >= 10 %}<span style="font-size: 0.75rem; color: var(--text-muted); margin-left: auto; font-style: italic;">Locked</span>{% endif %}
+                        </label>
+                        <label class="meal-checkbox {% if current_hour >= 15 %}locked{% endif %}">
+                            <input type="checkbox" name="snacks" value="1" {% if rsvp.eating_snacks %}checked{% endif %} {% if current_hour >= 15 %}disabled{% endif %} style="width: 1.2rem; height: 1.2rem; accent-color: var(--primary);">
+                            <span style="font-weight: 600; color: var(--text-color);">Snacks (Locks at 3 PM)</span>
+                            {% if current_hour >= 15 %}<span style="font-size: 0.75rem; color: var(--text-muted); margin-left: auto; font-style: italic;">Locked</span>{% endif %}
+                        </label>
+                        <label class="meal-checkbox {% if current_hour >= 17 %}locked{% endif %}">
+                            <input type="checkbox" name="dinner" value="1" {% if rsvp.eating_dinner %}checked{% endif %} {% if current_hour >= 17 %}disabled{% endif %} style="width: 1.2rem; height: 1.2rem; accent-color: var(--primary);">
+                            <span style="font-weight: 600; color: var(--text-color);">Dinner (Locks at 5 PM)</span>
+                            {% if current_hour >= 17 %}<span style="font-size: 0.75rem; color: var(--text-muted); margin-left: auto; font-style: italic;">Locked</span>{% endif %}
+                        </label>
+                    </div>
+                    <button type="submit" name="rsvp_submit" class="btn-premium" style="width: 100%;">
+                        Save Meal Choices
+                    </button>
+                </form>
+            </div>
+
+
+        </div> <!-- End of flex-direction: column wrapper -->
+    </div>
+{% endblock %}

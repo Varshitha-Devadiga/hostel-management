@@ -1,0 +1,121 @@
+{% extends "base.html" %}
+{% block title %}Warden Login | BCWD Hostel Management{% endblock %}
+
+{% block body %}
+<!-- Header -->
+<header class="admin-header sticky-top py-3">
+    <div class="container d-flex justify-content-between align-items-center">
+        <div class="d-flex align-items-center gap-2">
+            <div class="icon-badge" style="width:40px;height:40px;background:var(--primary-container);">
+                <span class="material-symbols-outlined text-white">shield</span>
+            </div>
+            <h1 class="h5 mb-0 fw-bold text-primary-custom">BCWD Hostel Management</h1>
+        </div>
+        <span class="d-none d-md-inline text-muted small fw-semibold">Karnataka State Government</span>
+    </div>
+</header>
+
+<!-- Main -->
+<main class="flex-grow-1 d-flex align-items-center justify-content-center pattern-bg px-3 py-5">
+    <div class="w-100" style="max-width: 440px;">
+        <!-- Branding -->
+        <div class="text-center mb-4">
+            <div class="icon-badge mx-auto mb-3" style="width:3.5rem;height:3.5rem;">
+                <span class="material-symbols-outlined fs-3 text-primary-custom">shield_person</span>
+            </div>
+            <h2 class="heading-lg text-primary-custom">Warden Login</h2>
+            <p class="text-muted mt-1">Access the BCWD Administrator Portal</p>
+        </div>
+
+        <!-- Card -->
+        <div class="glass-card rounded-4 p-4 p-md-5">
+            <!-- Flash Messages -->
+            {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+            {% for category, msg in messages %}
+            <div class="alert alert-{{ category }} py-2 small">{{ msg }}</div>
+            {% endfor %}
+            {% endif %}
+            {% endwith %}
+
+            <!-- Login Form -->
+            <form method="POST" action="{{ url_for('auth.login_admin') }}" id="loginForm" novalidate>
+                {{ form.hidden_tag() }}
+
+                <!-- Email -->
+                <div class="mb-3">
+                    <label for="email" class="form-label fw-semibold small text-muted">Warden Email ID</label>
+                    <div class="input-group">
+                        <span class="input-group-text bg-light border-end-0"><span class="material-symbols-outlined text-muted">alternate_email</span></span>
+                        {{ form.email(class="form-control border-start-0 bg-light", placeholder="your.email@example.com") }}
+                    </div>
+                    {% if form.email.errors %}
+                    <div class="text-danger small mt-1">{{ form.email.errors[0] }}</div>
+                    {% endif %}
+                </div>
+
+                <!-- Password -->
+                <div class="mb-3">
+                    <label for="password" class="form-label fw-semibold small text-muted">Password</label>
+                    <div class="input-group">
+                        <span class="input-group-text bg-light border-end-0"><span class="material-symbols-outlined text-muted">lock</span></span>
+                        {{ form.password(class="form-control border-start-0 border-end-0 bg-light", placeholder="••••••••") }}
+                        <button class="input-group-text bg-light border-start-0" type="button" onclick="togglePassword()" aria-label="Toggle password">
+                            <span class="material-symbols-outlined text-muted" id="pwdIcon">visibility</span>
+                        </button>
+                    </div>
+                    {% if form.password.errors %}
+                    <div class="text-danger small mt-1">{{ form.password.errors[0] }}</div>
+                    {% endif %}
+                </div>
+
+                <!-- Remember + Forgot -->
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <div class="form-check">
+                        {{ form.remember(class="form-check-input") }}
+                        <label class="form-check-label small text-muted" for="remember">Remember device</label>
+                    </div>
+                    <a href="#" class="small fw-semibold text-primary-custom text-decoration-none">Forgot Password?</a>
+                </div>
+
+                <!-- Submit -->
+                <button type="submit" class="btn btn-primary w-100 py-3 fw-bold d-flex align-items-center justify-content-center gap-2" id="loginBtn">
+                    <span id="btnText">Secure Login</span>
+                    <span class="material-symbols-outlined" id="btnIcon">login</span>
+                    <span class="spinner-border spinner-border-sm d-none" id="btnSpinner" role="status"></span>
+                </button>
+            </form>
+        </div>
+    </div>
+</main>
+
+<!-- Footer -->
+<footer class="bcwd-footer py-4 mt-auto">
+    <div class="container d-flex flex-column flex-md-row justify-content-between align-items-center text-center gap-3">
+        <div>
+            <p class="small mb-1 opacity-75">© 2024 BCWD Government of Karnataka. All Rights Reserved.</p>
+            <p class="small mb-0 opacity-75">© 2024 ಹಿಂದುಳಿದ ವರ್ಗಗಳ ಕಲ್ಯಾಣ ಇಲಾಖೆ, ಕರ್ನಾಟಕ ಸರ್ಕಾರ.</p>
+        </div>
+        <div class="d-flex gap-3 small">
+            <a href="#" class="text-decoration-none">Privacy Policy</a>
+            <a href="#" class="text-decoration-none">Contact Us / ಸಂಪರ್ಕಿಸಿ</a>
+        </div>
+    </div>
+</footer>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+function togglePassword(){
+    const p=document.getElementById('password'),i=document.getElementById('pwdIcon');
+    if(p.type==='password'){p.type='text';i.textContent='visibility_off';}
+    else{p.type='password';i.textContent='visibility';}
+}
+document.getElementById('loginForm').addEventListener('submit',function(){
+    const btn=document.getElementById('loginBtn'),txt=document.getElementById('btnText'),
+          ic=document.getElementById('btnIcon'),sp=document.getElementById('btnSpinner');
+    txt.textContent='Authenticating...'; ic.classList.add('d-none'); sp.classList.remove('d-none');
+    btn.disabled=true;
+});
+</script>
+{% endblock %}

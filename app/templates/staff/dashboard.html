@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Staff Control Panel - BCWD Portal</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/theme.css') }}">
+</head>
+<body class="ag-admin-layout">
+    <!-- Persistent System Sidebar Component -->
+    <aside class="ag-sidebar">
+        <div class="ag-sidebar-brand">
+            <h3>BCWD Hostel</h3>
+            <span>Staff Portal</span>
+        </div>
+        <nav class="ag-sidebar-menu">
+            <a href="#" class="ag-menu-item active">📋 Live Operations</a>
+            <a href="#" class="ag-menu-item">📅 Weekly Menu Planner</a>
+            <a href="#" class="ag-menu-item">🛒 Grocery Request Panel</a>
+            <a href="{{ url_for('auth.logout') }}" class="ag-menu-item ag-menu-logout">🚪 System Sign Out</a>
+        </nav>
+    </aside>
+
+    <!-- Main Content Workspace Area -->
+    <main class="ag-main-content">
+        <header class="ag-view-header">
+            <div class="ag-header-profile-block">
+                {% if profile and profile.avatar_path %}
+                    <img src="/static/uploads/staff/{{ current_user.id }}.jpg" alt="Avatar" class="ag-profile-avatar">
+                {% else %}
+                    <div class="ag-avatar-placeholder">👤</div>
+                {% endif %}
+                <div>
+                    <h1>Welcome Back, {{ current_user.email }}</h1>
+                    <p>Current Marital Status Assignment: <strong>{{ profile.marital_status if profile else 'N/A' }}</strong></p>
+                </div>
+            </div>
+            <div class="ag-live-indicator-tag">
+                <span class="ag-pulse-dot"></span> Live Systems Active
+            </div>
+        </header>
+
+        <!-- Live Operations Stats Bento Row -->
+        <div class="ag-bento-grid">
+            <div class="ag-card ag-card-elevated ag-glass-panel ag-col-4 text-center">
+                <span class="ag-metric-icon">🧑🎓</span>
+                <h2>{{ total_present }}</h2>
+                <p class="ag-metric-label">Students Present Today</p>
+            </div>
+            <div class="ag-card ag-card-elevated ag-glass-panel ag-col-4 text-center ag-border-veg">
+                <span class="ag-metric-icon">🟢</span>
+                <h2>{{ veg_count }}</h2>
+                <p class="ag-metric-label">Vegetarian Mess Profiles</p>
+            </div>
+            <div class="ag-card ag-card-elevated ag-glass-panel ag-col-4 text-center ag-border-nonveg">
+                <span class="ag-metric-icon">🔴</span>
+                <h2>{{ nonveg_count }}</h2>
+                <p class="ag-metric-label">Non-Vegetarian Profiles</p>
+            </div>
+        </div>
+
+        <!-- Weekly Menu Modification Grid Layer -->
+        <div class="ag-bento-grid mt-4">
+            <div class="ag-card ag-card-elevated ag-glass-panel ag-col-12">
+                <div class="ag-card-header-flex">
+                    <h3>🍱 Weekly Menu Planner Matrix</h3>
+                    <span class="ag-badge-alert">Changes Automatically Alert Warden</span>
+                </div>
+                <hr class="ag-divider">
+                
+                <table class="ag-data-table">
+                    <thead>
+                        <tr>
+                            <th>Day</th>
+                            <th>Breakfast Preference (1st)</th>
+                            <th>Lunch Matrix</th>
+                            <th>Dinner Settings</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>Monday</strong></td>
+                            <td>Idli + Sambar</td>
+                            <td>Veg Meals / Rice Sambar</td>
+                            <td>Roti + Dal Curry</td>
+                            <td><button class="ag-btn-table-edit">Modify Day</button></td>
+                        </tr>
+                        <tr>
+                            <td><strong>Tuesday</strong></td>
+                            <td>Poha + Chutney</td>
+                            <td>Rice + Egg Curry Option</td>
+                            <td>Meals + Curd</td>
+                            <td><button class="ag-btn-table-edit">Modify Day</button></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Grocery Request System Form Frame -->
+        <div class="ag-bento-grid mt-4">
+            <div class="ag-card ag-card-elevated ag-glass-panel ag-col-12">
+                <h3>🛒 End-of-Month Grocery Provision Request</h3>
+                <p class="ag-card-subtitle">Submit comprehensive commodity requirements to the Hostel Warden for next month's allocation pipeline.</p>
+                <hr class="ag-divider">
+
+                <form action="#" method="POST" class="ag-inline-form-row">
+                    <div class="ag-form-group ag-flex-3">
+                        <label for="grocery_item">Commodity Name / Details</label>
+                        <input type="text" id="grocery_item" name="item" required placeholder="e.g., Sona Masuri Rice (250 KG), Sunflower Oil (50L)" class="ag-form-input">
+                    </div>
+                    <div class="ag-form-group ag-flex-1">
+                        <label for="delivery_timeline">Urgency Tier</label>
+                        <select id="delivery_timeline" name="tier" class="ag-form-input">
+                            <option value="Normal">Next Month Bulk</option>
+                            <option value="Critical">Immediate Restock</option>
+                        </select>
+                    </div>
+                    <div class="ag-form-group ag-flex-1 alignment-bottom">
+                        <button type="submit" class="ag-btn-primary ag-btn-block ag-hover-interactive">Dispatch Request</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </main>
+</body>
+</html>

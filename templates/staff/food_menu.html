@@ -1,0 +1,65 @@
+{% extends "staff/staff_base.html" %}
+
+{% block title %}Food Menu Management | Staff Portal{% endblock %}
+{% block page_title %}Food Menu{% endblock %}
+
+{% block content %}
+<div class="glass-panel" style="padding: 2rem; margin-bottom: 2rem; display: flex; justify-content: space-between; align-items: center;">
+    <div>
+        <h1 style="font-size: 1.75rem; font-weight: 700; color: var(--primary); margin-bottom: 0.5rem;">Food Menu Management</h1>
+        <p style="color: var(--text-muted); font-size: 1rem;">View weekly nutrition and menu schedule for the hostel.</p>
+    </div>
+</div>
+
+<div style="display: flex; flex-direction: column; gap: 1.5rem; margin-bottom: 2rem;">
+    {% set days_order = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'] %}
+    {% for day in days_order %}
+    {% set meals = weekly_menu.get(day, {'breakfast': '', 'lunch': '', 'snacks': '', 'dinner': ''}) %}
+    {% set is_today = (day == today_str) %}
+    
+    <div class="glass-panel" style="padding: 1.5rem; border: {% if is_today %}2px solid var(--primary){% else %}1px solid var(--border-color){% endif %}; position: relative;">
+        {% if is_today %}
+        <div style="position: absolute; top: 0; right: 2rem; background: var(--success); color: white; padding: 0.25rem 1rem; border-bottom-left-radius: 8px; border-bottom-right-radius: 8px; font-weight: 700; font-size: 0.8rem; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
+            TODAY
+        </div>
+        {% endif %}
+        
+        <form action="{{ url_for('staff.edit_food_menu', day=day) }}" method="POST">
+            <div style="display: flex; align-items: center; gap: 2rem;">
+                <!-- Day Header -->
+                <div style="width: 150px; flex-shrink: 0;">
+                    <h4 style="font-size: 1.25rem; font-weight: 700; color: var(--primary); margin: 0;">{{ day }}</h4>
+                </div>
+                
+                <!-- Inputs Row -->
+                <div style="display: flex; gap: 1.5rem; flex: 1;">
+                    <div style="flex: 1;">
+                        <label style="font-size: 0.75rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase; margin-bottom: 0.25rem; display: block;">Breakfast</label>
+                        <input type="text" name="breakfast" value="{{ meals['breakfast'] }}" class="form-control" style="width: 100%;" placeholder="Add menu...">
+                    </div>
+                    <div style="flex: 1;">
+                        <label style="font-size: 0.75rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase; margin-bottom: 0.25rem; display: block;">Lunch</label>
+                        <input type="text" name="lunch" value="{{ meals['lunch'] }}" class="form-control" style="width: 100%;" placeholder="Add menu...">
+                    </div>
+                    <div style="flex: 1;">
+                        <label style="font-size: 0.75rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase; margin-bottom: 0.25rem; display: block;">Snacks</label>
+                        <input type="text" name="snacks" value="{{ meals['snacks'] }}" class="form-control" style="width: 100%;" placeholder="Add menu...">
+                    </div>
+                    <div style="flex: 1;">
+                        <label style="font-size: 0.75rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase; margin-bottom: 0.25rem; display: block;">Dinner</label>
+                        <input type="text" name="dinner" value="{{ meals['dinner'] }}" class="form-control" style="width: 100%;" placeholder="Add menu...">
+                    </div>
+                </div>
+                
+                <!-- Submit Button -->
+                <div style="flex-shrink: 0; padding-top: 1rem;">
+                    <button type="submit" class="btn btn-primary" style="display: flex; align-items: center; gap: 0.5rem; white-space: nowrap;">
+                        <span class="material-symbols-outlined" style="font-size: 18px;">save</span> Update
+                    </button>
+                </div>
+            </div>
+        </form>
+    </div>
+    {% endfor %}
+</div>
+{% endblock %}

@@ -1,0 +1,109 @@
+{% extends "admin/admin_base.html" %}
+
+{% block title %}Complaint Management | BCWD{% endblock %}
+{% block page_title %}Student Complaints{% endblock %}
+
+{% block content %}
+<!-- Header & Search -->
+<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; flex-wrap: wrap; gap: 1rem;">
+    <div style="display: flex; gap: 1rem;">
+        <div style="display: flex; align-items: center; gap: 1rem; background: rgba(0,0,0,0.02); padding: 0.5rem 1rem; border-radius: 8px; border: 1px solid var(--border-color);">
+            <span class="material-symbols-outlined" style="color: var(--text-muted);">search</span>
+            <input type="text" placeholder="Search complaints..." style="border: none; background: transparent; outline: none; font-size: 0.9rem; min-width: 250px;" />
+        </div>
+        <select class="form-control" style="width: auto; background: rgba(0,0,0,0.02);"><option>Warden Office</option></select>
+    </div>
+</div>
+
+<!-- KPI Bento Grid: Metrics -->
+<div class="grid-cols-4" style="margin-bottom: 2rem;">
+    <div class="glass-panel" style="padding: 1.5rem; border-left: 4px solid var(--primary);">
+        <p style="font-size: 0.85rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase;">Total Tickets</p>
+        <h4 style="font-size: 2rem; font-weight: 700; color: var(--primary); margin-top: 0.5rem; margin-bottom: 0.5rem;">{{ pending_complaints|length + resolved_complaints|length }}</h4>
+    </div>
+    <div class="glass-panel" style="padding: 1.5rem; border-left: 4px solid var(--danger);">
+        <p style="font-size: 0.85rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase;">Pending</p>
+        <h4 style="font-size: 2rem; font-weight: 700; color: var(--danger); margin-top: 0.5rem; margin-bottom: 0.5rem;">{{ pending_complaints|length }}</h4>
+    </div>
+    <div class="glass-panel" style="padding: 1.5rem; border-left: 4px solid var(--success);">
+        <p style="font-size: 0.85rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase;">Resolved</p>
+        <h4 style="font-size: 2rem; font-weight: 700; color: var(--success); margin-top: 0.5rem; margin-bottom: 0.5rem;">{{ resolved_complaints|length }}</h4>
+    </div>
+</div>
+
+<!-- Filter Pills -->
+<div style="display: flex; flex-wrap: wrap; gap: 0.75rem; margin-bottom: 2rem;">
+    <button class="btn-premium" style="border-radius: 50px; padding: 0.5rem 1.25rem;">Pending Action</button>
+    <button class="btn-outline" style="border-radius: 50px; padding: 0.5rem 1.25rem;">Recently Resolved</button>
+</div>
+
+<!-- Complaint List -->
+<div style="display: flex; flex-direction: column; gap: 1.5rem;">
+    <h3 style="font-size: 1.2rem; color: var(--primary); font-weight: 700; border-bottom: 2px solid var(--border-color); padding-bottom: 0.5rem;">Pending Complaints</h3>
+    {% if pending_complaints %}
+        {% for complaint, student in pending_complaints %}
+            <div class="glass-panel" style="padding: 1.5rem; display: flex; flex-direction: column; gap: 1rem;">
+                <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+                    <div style="display: flex; gap: 1rem; align-items: center;">
+                        <img src="https://ui-avatars.com/api/?name={{ student.full_name }}&background=5d4037&color=fff" style="width: 40px; height: 40px; border-radius: 50%;" />
+                        <div>
+                            <h4 style="font-size: 1.1rem; font-weight: 700; color: var(--primary); margin: 0;">{{ student.full_name }}</h4>
+                            <p style="font-size: 0.85rem; color: var(--text-muted); margin: 0;">Room: {{ student.room_number if student.room_number else 'N/A' }} • {{ complaint.created_at.strftime('%b %d, %Y') }}</p>
+                        </div>
+                    </div>
+                    <span style="background: rgba(220,53,69,0.1); color: var(--danger); padding: 0.25rem 0.75rem; border-radius: 50px; font-size: 0.8rem; font-weight: 700;">{{ complaint.category }}</span>
+                </div>
+                
+                <div style="background: rgba(0,0,0,0.02); padding: 1rem; border-radius: 8px; border-left: 3px solid var(--danger);">
+                    <p style="font-size: 0.95rem; line-height: 1.5; margin: 0; color: var(--text);">{{ complaint.description }}</p>
+                </div>
+
+                {% if complaint.image_path %}
+                <div style="margin-top: 0.5rem;">
+                    <a href="{{ url_for('static', filename='uploads/complaints/' + complaint.image_path) }}" target="_blank" style="font-size: 0.85rem; color: var(--primary); text-decoration: underline; font-weight: 600; display: flex; align-items: center; gap: 0.25rem;">
+                        <span class="material-symbols-outlined" style="font-size: 16px;">image</span> View Attached Evidence
+                    </a>
+                </div>
+                {% endif %}
+
+                <div style="margin-top: 1rem; border-top: 1px solid var(--border-color); padding-top: 1rem;">
+                    <form method="POST" action="{{ url_for('admin.resolve_complaint', id=complaint.id) }}" style="display: flex; gap: 1rem; flex-wrap: wrap;">
+                        <input type="text" name="admin_notes" placeholder="Resolution notes (optional)" style="flex: 1; padding: 0.75rem; border: 1px solid var(--border-color); border-radius: 8px; font-family: inherit; min-width: 200px;" />
+                        <button type="submit" class="btn-premium" style="background: var(--success); color: white; display: flex; align-items: center; gap: 0.5rem;">
+                            <span class="material-symbols-outlined">check_circle</span> Mark Resolved
+                        </button>
+                    </form>
+                </div>
+            </div>
+        {% endfor %}
+    {% else %}
+        <div class="glass-panel" style="display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 3rem; color: var(--text-muted);">
+            <span class="material-symbols-outlined" style="font-size: 48px; margin-bottom: 1rem; opacity: 0.5;">task_alt</span>
+            <p style="font-weight: 500; font-size: 1.1rem;">No pending complaints.</p>
+        </div>
+    {% endif %}
+
+    <h3 style="font-size: 1.2rem; color: var(--primary); font-weight: 700; border-bottom: 2px solid var(--border-color); padding-bottom: 0.5rem; margin-top: 2rem;">Recently Resolved</h3>
+    {% if resolved_complaints %}
+        <div class="grid-cols-2">
+        {% for complaint, student in resolved_complaints %}
+            <div class="glass-panel" style="padding: 1rem; opacity: 0.8;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
+                    <span style="font-size: 0.9rem; font-weight: 700; color: var(--primary);">{{ complaint.category }}</span>
+                    <span style="font-size: 0.8rem; color: var(--success); font-weight: 700;"><span class="material-symbols-outlined" style="font-size: 14px; vertical-align: middle;">check</span> Resolved</span>
+                </div>
+                <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 0.5rem;">{{ complaint.description[:100] }}...</p>
+                <p style="font-size: 0.8rem; color: var(--text-muted); margin: 0;">By {{ student.full_name }} on {{ complaint.created_at.strftime('%b %d') }}</p>
+                {% if complaint.admin_notes %}
+                <div style="background: rgba(40,167,69,0.1); padding: 0.5rem; border-radius: 4px; margin-top: 0.5rem;">
+                    <p style="font-size: 0.8rem; color: var(--success); margin: 0;"><strong>Note:</strong> {{ complaint.admin_notes }}</p>
+                </div>
+                {% endif %}
+            </div>
+        {% endfor %}
+        </div>
+    {% else %}
+        <p style="color: var(--text-muted); text-align: center; padding: 2rem;">No recently resolved complaints.</p>
+    {% endif %}
+</div>
+{% endblock %}

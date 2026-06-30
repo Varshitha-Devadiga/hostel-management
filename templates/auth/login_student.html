@@ -1,0 +1,131 @@
+{% extends "base.html" %}
+{% block extra_head %}
+  <link href="{{ url_for('static', filename='css/auth_student_login.css') }}" rel="stylesheet">
+{% endblock %}
+{% block content %}
+
+<!-- Header -->
+<header class="student-header sticky-top py-3">
+  <div class="container d-flex flex-column flex-md-row justify-content-between align-items-center">
+    <div class="d-flex flex-column align-items-center align-items-md-start mb-2 mb-md-0">
+      <h1 class="h6 mb-1 fw-bold text-primary-custom">ಶ್ರೀ ಡಿ. ದೇವರಾಜ ಅರಸು, ಹಿಂದುಳಿದ ವರ್ಗಗಳ ಕಲ್ಯಾಣ ಇಲಾಖೆ</h1>
+      <span class="small text-muted fw-semibold">ವೃತ್ತಿಪರ ಮಹಿಳಾ ವಿದ್ಯಾರ್ಥಿ ನಿಲಯ, ಬಿಜೈ ಪಡೀಲ್</span>
+    </div>
+    <span class="d-none d-md-inline text-muted small badge bg-light border px-3 py-2">Student Login</span>
+  </div>
+</header>
+
+<!-- Main -->
+<main class="flex-grow-1 d-flex align-items-center justify-content-center pattern-bg px-3 py-5 student-login">
+  <div class="w-100" style="max-width: 440px;">
+    <div class="glass-card rounded-4 p-4 p-md-5">
+      <!-- Icon + Heading -->
+      <div class="text-center mb-4">
+        <div class="icon-badge mx-auto mb-3">
+          <span class="material-symbols-outlined fs-3 text-primary-custom">person_outline</span>
+        </div>
+        <h2 class="heading-lg text-primary-custom">Student Login</h2>
+        <p class="text-muted small mt-1">Please enter your credentials to access the hostel portal</p>
+      </div>
+
+      <!-- Flash Messages -->
+      {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        {% for category, msg in messages %}
+        <div class="alert alert-{{ category }} py-2 small">{{ msg }}</div>
+        {% endfor %}
+      {% endif %}
+      {% endwith %}
+
+      <!-- Login Form -->
+      <form method="POST" action="{{ url_for('auth.login_student') }}" id="loginForm">
+        {{ form.hidden_tag() }}
+
+        <!-- Email -->
+        <div class="mb-3">
+          <label for="email" class="form-label fw-semibold small">Email Address</label>
+          <div class="input-group">
+            <span class="input-group-text bg-light border-end-0"><span class="material-symbols-outlined text-muted">email</span></span>
+            {{ form.email(class="form-control border-start-0 bg-light", placeholder="your.email@gmail.com", pattern="^[a-zA-Z0-9._%+-]+@gmail\\.com$", title="Please enter a valid @gmail.com address") }}
+          </div>
+          {% if form.email.errors %}
+          <div class="text-danger small mt-1">{{ form.email.errors[0] }}</div>
+          {% endif %}
+        </div>
+
+        <!-- Password -->
+        <div class="mb-3">
+          <label for="password" class="form-label fw-semibold small">Password</label>
+          <div class="input-group">
+            <span class="input-group-text bg-light border-end-0"><span class="material-symbols-outlined text-muted">lock</span></span>
+            {{ form.password(class="form-control border-start-0 border-end-0 bg-light", placeholder="••••••••") }}
+            <button class="input-group-text bg-light border-start-0" type="button" onclick="togglePassword()" aria-label="Toggle password">
+              <span class="material-symbols-outlined text-muted" id="pwdIcon">visibility</span>
+            </button>
+          </div>
+          {% if form.password.errors %}
+          <div class="text-danger small mt-1">{{ form.password.errors[0] }}</div>
+          {% endif %}
+          <div class="d-flex justify-content-between mt-2">
+            <div class="form-check">
+              {{ form.remember(class="form-check-input") }}
+              <label class="form-check-label small text-muted" for="remember">Remember me</label>
+            </div>
+            <a href="#" class="small text-primary-custom text-decoration-none">Forgot Password?</a>
+          </div>
+        </div>
+
+        <!-- Submit -->
+        <button type="submit" class="btn btn-primary w-100 py-3 fw-bold d-flex align-items-center justify-content-center gap-2" id="loginBtn">
+          <span id="btnText">Login</span>
+          <span class="material-symbols-outlined" id="btnIcon">arrow_forward</span>
+          <span class="spinner-border spinner-border-sm d-none" id="btnSpinner" role="status"></span>
+        </button>
+
+        <!-- Divider -->
+        <div class="d-flex align-items-center my-4">
+          <hr class="flex-grow-1"><span class="px-3 text-muted small">OR</span><hr class="flex-grow-1">
+        </div>
+
+        <!-- Register -->
+        <a href="{{ url_for('auth.register_student') }}" class="btn btn-outline-primary w-100 py-2 fw-bold">Register New Student</a>
+      </form>
+
+      <!-- Info box -->
+      <div class="mt-4 p-3 rounded-3" style="background: var(--surface-container-low); border: 1px solid var(--outline-variant);">
+        <div class="d-flex gap-2 align-items-start">
+          <span class="material-symbols-outlined text-muted small">info</span>
+          <p class="mb-0 small text-muted">By logging in, you agree to follow the <strong>Women's Hostel</strong> guidelines and code of conduct.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</main>
+
+<!-- Footer -->
+<footer class="bcwd-footer py-4 mt-auto">
+  <div class="container text-center">
+    <div class="d-flex flex-column flex-md-row justify-content-center gap-2 gap-md-4 mb-2 small">
+      <span>BACKWARD CLASSES WELFARE DEPARTMENT</span>
+      <span class="d-none d-md-inline">•</span>
+      <span>Women's Hostel, Bijai Padil</span>
+    </div>
+    <p class="fw-bold mb-1">BCWD - 1878</p>
+    <p class="small mb-0 opacity-75">© 2024 BCWD. All Rights Reserved.</p>
+  </div>
+</footer>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+function togglePassword(){
+    const p=document.getElementById('password'), i=document.getElementById('pwdIcon');
+    if(p.type==='password'){p.type='text'; i.textContent='visibility_off';}
+    else{p.type='password'; i.textContent='visibility';}
+}
+document.getElementById('loginForm').addEventListener('submit',function(){
+    const btn=document.getElementById('loginBtn'), txt=document.getElementById('btnText'), ic=document.getElementById('btnIcon'), sp=document.getElementById('btnSpinner');
+    txt.textContent='Validating...'; ic.classList.add('d-none'); sp.classList.remove('d-none'); btn.disabled=true;
+});
+</script>
+{% endblock %}

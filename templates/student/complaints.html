@@ -1,0 +1,192 @@
+{% extends "student/student_base.html" %}
+{% block title %}Complaints | BCWD{% endblock %}
+{% block page_title %}Complaints{% endblock %}
+
+{% block extra_head %}
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet">
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script>
+    tailwind.config = {
+        darkMode: "class",
+        theme: {
+            extend: {
+                "colors": {
+                    "primary-fixed": "#ffdbd0",
+                    "surface-container": "#f0eded",
+                    "surface-container-high": "#eae8e7",
+                    "primary-container": "#5d4037",
+                    "secondary-container": "#fed7ca",
+                    "secondary": "#75584d",
+                    "surface": "#fbf9f8",
+                    "on-primary": "#ffffff",
+                    "on-primary-container": "#d4ada1",
+                    "surface-container-low": "#f5f3f3",
+                    "error-container": "#ffdad6",
+                    "primary": "#442a22",
+                    "on-error": "#ffffff",
+                    "background": "#fbf9f8",
+                    "outline": "#827470",
+                    "outline-variant": "#d4c3be",
+                    "on-surface": "#1b1c1c",
+                    "on-surface-variant": "#504441",
+                    "on-secondary-container": "#795c51",
+                    "surface-container-lowest": "#ffffff"
+                }
+            }
+        }
+    }
+</script>
+<style>
+    .material-symbols-outlined {font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;}
+</style>
+<script>
+    function updateFileName(input) {
+        if (input.files && input.files.length > 0) {
+            document.getElementById('file-label-text').innerText = input.files[0].name;
+            document.getElementById('file-label-subtext').innerText = "Click to change";
+        }
+    }
+</script>
+{% endblock %}
+
+{% block content %}
+<main class="flex-1 p-6 md:p-8 overflow-x-hidden max-w-6xl mx-auto">
+    <div class="flex items-center gap-3 mb-8">
+        <a href="{{ url_for('student.dashboard') }}" class="p-2 hover:bg-surface-container rounded-full transition-colors text-on-surface-variant">
+            <span class="material-symbols-outlined">arrow_back</span>
+        </a>
+        <div>
+            <h1 class="text-3xl font-bold text-primary">Complaints & Suggestions</h1>
+            <p class="text-sm text-on-surface-variant mt-1">Help us improve your living experience. Please provide details of any issues or suggestions below.</p>
+        </div>
+    </div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        
+        <!-- Left: Form Area -->
+        <div class="lg:col-span-2">
+            <div class="bg-surface rounded-2xl shadow-[0px_4px_24px_rgba(68,42,34,0.06)] border border-outline-variant p-8">
+                <form method="POST" action="{{ url_for('student.complaints') }}" enctype="multipart/form-data" class="space-y-6">
+                    
+                    <div>
+                        <label class="block text-xs font-bold text-on-surface-variant mb-2">Issue Category</label>
+                        <select name="category" required class="w-full rounded-xl border-outline-variant bg-surface-container-low focus:ring-2 focus:ring-primary text-sm p-4 text-on-surface font-medium border-none appearance-none">
+                            <option value="Food">Food & Dining</option>
+                            <option value="Electricity">Electricity & Lighting</option>
+                            <option value="Plumbing">Plumbing & Water</option>
+                            <option value="Internet">Internet / Wi-Fi</option>
+                            <option value="Furniture">Furniture & Room</option>
+                            <option value="Other">Other / Suggestion</option>
+                        </select>
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-bold text-on-surface-variant mb-2">Description</label>
+                        <textarea name="description" required rows="4" class="w-full rounded-xl border-none bg-surface-container-low focus:ring-2 focus:ring-primary text-sm p-4 text-on-surface placeholder-on-surface-variant/50 resize-none" placeholder="Describe the issue in detail..."></textarea>
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-bold text-on-surface-variant mb-2">Supporting Image (Optional)</label>
+                        <label for="image-upload" class="border-2 border-dashed border-outline-variant rounded-xl p-8 flex flex-col items-center justify-center cursor-pointer hover:bg-surface-container-low transition-colors group">
+                            <span class="material-symbols-outlined text-outline-variant group-hover:text-primary text-[32px] mb-3 transition-colors">cloud_upload</span>
+                            <span id="file-label-text" class="text-sm font-bold text-primary">Click to upload or drag and drop</span>
+                            <span id="file-label-subtext" class="text-xs text-on-surface-variant mt-1">PNG, JPG or PDF (max. 5MB)</span>
+                            <input id="image-upload" type="file" name="image" accept=".png,.jpg,.jpeg,.pdf" class="hidden" onchange="updateFileName(this)">
+                        </label>
+                    </div>
+
+                    <div class="pt-2">
+                        <button type="submit" class="bg-primary text-white font-bold py-3 px-8 rounded-full hover:bg-primary-container transition-colors shadow-md flex items-center gap-2">
+                            Submit Complaint <span class="material-symbols-outlined text-[18px]">send</span>
+                        </button>
+                    </div>
+
+                </form>
+            </div>
+        </div>
+
+        <!-- Right: Info Boxes -->
+        <div class="lg:col-span-1 space-y-6">
+            <div class="bg-primary rounded-2xl p-6 text-white shadow-md relative overflow-hidden">
+                <span class="material-symbols-outlined absolute right-[-10px] bottom-[-20px] text-[120px] opacity-10">timer</span>
+                <h3 class="font-bold text-lg mb-4 relative z-10">Response Time</h3>
+                <div class="flex items-center gap-3 relative z-10">
+                    <div class="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center shrink-0">
+                        <span class="material-symbols-outlined text-white">schedule</span>
+                    </div>
+                    <div>
+                        <p class="text-xs text-white/80">Average resolution</p>
+                        <p class="text-lg font-bold">24-48 Hours</p>
+                    </div>
+                </div>
+            </div>
+
+
+        </div>
+    </div>
+
+    <!-- History Section -->
+    <div class="mt-12">
+        <div class="flex items-center justify-between mb-6">
+            <h2 class="text-xl font-bold text-primary">Complaint History</h2>
+            <div class="bg-surface-container-low rounded-full p-1 flex">
+                <button class="px-4 py-1.5 rounded-full bg-white text-xs font-bold text-primary shadow-sm border border-outline-variant/30">All</button>
+                <button class="px-4 py-1.5 rounded-full text-xs font-bold text-on-surface-variant hover:text-primary transition-colors">Pending</button>
+            </div>
+        </div>
+
+        <div class="space-y-4">
+            {% if history %}
+                {% for item in history %}
+                    <div class="bg-surface rounded-xl p-5 border border-outline-variant shadow-sm flex items-start gap-4 hover:shadow-md transition-shadow cursor-pointer">
+                        
+                        <!-- Icon mapping -->
+                        {% set icon_color = "bg-[#ffe5d9] text-[#d45d3e]" %}
+                        {% set icon = "info" %}
+                        
+                        {% if item.category == 'Food' %}
+                            {% set icon_color = "bg-[#ffdac1] text-[#b87042]" %}
+                            {% set icon = "restaurant" %}
+                        {% elif item.category == 'Electricity' %}
+                            {% set icon_color = "bg-[#d1e8e2] text-[#4a8a7a]" %}
+                            {% set icon = "bolt" %}
+                        {% elif item.category == 'Plumbing' %}
+                            {% set icon_color = "bg-[#dbeafe] text-[#3b82f6]" %}
+                            {% set icon = "water_drop" %}
+                        {% endif %}
+                        
+                        <div class="w-10 h-10 rounded-lg {{ icon_color }} flex items-center justify-center shrink-0">
+                            <span class="material-symbols-outlined text-[20px]">{{ icon }}</span>
+                        </div>
+                        
+                        <div class="flex-1 min-w-0">
+                            <div class="flex items-center justify-between mb-1">
+                                <h3 class="text-sm font-bold text-primary truncate pr-4">{{ item.category }} Issue</h3>
+                                {% if item.status == 'Resolved' %}
+                                <span class="bg-green-100 text-green-800 text-[10px] uppercase font-bold px-3 py-1 rounded-full border border-green-200 shrink-0">Resolved</span>
+                                {% else %}
+                                <span class="bg-yellow-100 text-yellow-800 text-[10px] uppercase font-bold px-3 py-1 rounded-full border border-yellow-200 shrink-0">Pending</span>
+                                {% endif %}
+                            </div>
+                            <p class="text-xs text-on-surface-variant line-clamp-2 mb-3 leading-relaxed">{{ item.description }}</p>
+                            <div class="flex items-center gap-4 text-[10px] text-outline font-medium">
+                                <span class="flex items-center gap-1"><span class="material-symbols-outlined text-[12px]">calendar_today</span> {{ item.created_at.strftime('%b %d, %Y') }}</span>
+                                <span>#CMP-10{{ item.id }}</span>
+                            </div>
+                        </div>
+                        <div class="pt-2 text-outline">
+                            <span class="material-symbols-outlined">chevron_right</span>
+                        </div>
+                    </div>
+                {% endfor %}
+            {% else %}
+                <div class="text-center py-12 bg-surface rounded-xl border border-dashed border-outline-variant">
+                    <span class="material-symbols-outlined text-4xl text-outline opacity-50 mb-3">inbox</span>
+                    <p class="text-sm font-medium text-on-surface-variant">No complaints history</p>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</main>
+{% endblock %}

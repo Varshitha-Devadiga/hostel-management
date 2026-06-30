@@ -1,0 +1,299 @@
+{% extends "admin/admin_base.html" %}
+
+{% block title %}Student Profile - {{ student.full_name }} | BCWD{% endblock %}
+{% block page_title %}Student Profile View{% endblock %}
+
+{% block extra_head %}
+<style>
+    .profile-header {
+        background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
+        border-radius: 16px;
+        padding: 2rem;
+        display: flex;
+        align-items: center;
+        gap: 2rem;
+        margin-bottom: 2rem;
+        box-shadow: var(--shadow-md);
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .profile-avatar {
+        width: 120px;
+        height: 120px;
+        border-radius: 50%;
+        background: var(--accent);
+        color: var(--primary);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 3rem;
+        font-weight: 700;
+        box-shadow: 0 8px 16px rgba(0,0,0,0.2);
+        z-index: 2;
+    }
+
+    .profile-info {
+        color: var(--text-inverse);
+        z-index: 2;
+        flex: 1;
+    }
+
+    .info-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 1.5rem;
+    }
+
+    .info-item {
+        margin-bottom: 1rem;
+    }
+    
+    .info-label {
+        font-size: 0.85rem;
+        font-weight: 700;
+        color: var(--text-muted);
+        text-transform: uppercase;
+        margin-bottom: 0.25rem;
+    }
+
+    .info-value {
+        font-size: 1.1rem;
+        color: var(--primary);
+        font-weight: 500;
+    }
+
+    .section-title {
+        font-size: 1.25rem;
+        font-weight: 700;
+        color: var(--primary);
+        margin-bottom: 1.5rem;
+        border-bottom: 1px solid var(--border-color);
+        padding-bottom: 0.5rem;
+    }
+
+    .marks-table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 1rem;
+    }
+
+    .marks-table th, .marks-table td {
+        padding: 1rem;
+        text-align: left;
+        border-bottom: 1px dashed var(--border-color);
+    }
+
+    .marks-table th {
+        color: var(--text-muted);
+        font-weight: 600;
+        text-transform: uppercase;
+        font-size: 0.85rem;
+    }
+
+    .marks-table td {
+        color: var(--primary);
+        font-weight: 500;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div style="max-width: 1200px; margin: 0 auto;">
+
+    <!-- Action Bar -->
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+        <a href="{{ url_for('admin.manage_students') }}" class="btn-outline" style="display: inline-flex; align-items: center; gap: 0.5rem;">
+            <span class="material-symbols-outlined" style="font-size: 18px;">arrow_back</span> Back to Directory
+        </a>
+        
+        <div style="display: flex; gap: 0.75rem;">
+            {% if student.status != 'Verified' %}
+            <a href="{{ url_for('admin.approve_student', id=student.id) }}" class="btn-premium" style="background: var(--success); display: inline-flex; align-items: center; gap: 0.5rem;">
+                <span class="material-symbols-outlined" style="font-size: 18px;">check_circle</span> Approve Student
+            </a>
+            {% endif %}
+            
+            {% if student.status != 'Rejected' %}
+            <a href="{{ url_for('admin.reject_student', id=student.id) }}" onclick="return confirm('Are you sure you want to REJECT this student?');" class="btn-outline" style="color: var(--danger); border-color: var(--danger); display: inline-flex; align-items: center; gap: 0.5rem;">
+                <span class="material-symbols-outlined" style="font-size: 18px;">cancel</span> Reject Profile
+            </a>
+            {% endif %}
+            
+            <a href="{{ url_for('admin.delete_student', id=student.id) }}" onclick="return confirm('Are you sure you want to permanently DELETE this student?');" class="btn-outline" style="color: #6c757d; border-color: #6c757d; display: inline-flex; align-items: center; gap: 0.5rem;">
+                <span class="material-symbols-outlined" style="font-size: 18px;">delete</span> Delete
+            </a>
+        </div>
+    </div>
+
+    <!-- Smart Alert Engine (Warden-Side) -->
+    {% set is_higher_sem = False %}
+    {% if student.semester and student.semester.isdigit() and student.semester|int > 1 %}
+        {% set is_higher_sem = True %}
+    {% endif %}
+
+    {% set has_marks_cards = False %}
+    {% if student.user and student.user.marks_cards.count() > 0 %}
+        {% set has_marks_cards = True %}
+    {% endif %}
+
+    {% if is_higher_sem and not has_marks_cards %}
+    <div style="background: #f8d7da; border-left: 5px solid #dc3545; padding: 1.5rem; margin-bottom: 2rem; border-radius: 8px; display: flex; align-items: flex-start; gap: 1rem; box-shadow: 0 4px 6px rgba(220,53,69,0.1);">
+        <span class="material-symbols-outlined" style="font-size: 32px; color: #dc3545;">warning</span>
+        <div>
+            <h4 style="margin: 0 0 0.5rem 0; color: #721c24; font-weight: 700;">Missing Academic Records</h4>
+            <p style="margin: 0; color: #721c24; font-size: 0.95rem;">This student is in Semester {{ student.semester }} but has not uploaded any preceding semester Marks Cards. Compliance review is required.</p>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Profile Header -->
+    <div class="profile-header">
+        <span class="material-symbols-outlined" style="position: absolute; right: -2rem; bottom: -3rem; font-size: 250px; opacity: 0.1; z-index: 1;">account_circle</span>
+        
+        <div class="profile-avatar">
+            {{ student.full_name[0]|upper }}
+        </div>
+        <div class="profile-info">
+            <h2 style="font-size: 2.5rem; font-weight: 700; margin-bottom: 0.5rem; color: var(--accent);">{{ student.full_name }}</h2>
+            <div style="display: flex; gap: 1.5rem; opacity: 0.9;">
+                <span style="display: flex; align-items: center; gap: 0.5rem;"><span class="material-symbols-outlined" style="font-size: 18px;">school</span> {{ student.course }} (Sem {{ student.semester }})</span>
+                <span style="display: flex; align-items: center; gap: 0.5rem;"><span class="material-symbols-outlined" style="font-size: 18px;">phone_iphone</span> {{ student.mobile }}</span>
+                {% if student.status == 'Verified' %}
+                <span style="display: flex; align-items: center; gap: 0.5rem; color: #4ade80;"><span class="material-symbols-outlined" style="font-size: 18px;">verified</span> Verified</span>
+                {% else %}
+                <span style="display: flex; align-items: center; gap: 0.5rem; color: #facc15;"><span class="material-symbols-outlined" style="font-size: 18px;">pending</span> Pending Review</span>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <div class="info-grid">
+        <!-- Personal & Academic Details -->
+        <div class="glass-panel" style="padding: 2rem;">
+            <h3 class="section-title">Personal & Academic Details</h3>
+            
+            <div class="info-item">
+                <div class="info-label">Date of Birth</div>
+                <div class="info-value">{{ student.dob if student.dob else 'N/A' }}</div>
+            </div>
+            
+            <div class="info-item">
+                <div class="info-label">Food Preference</div>
+                <div class="info-value" style="text-transform: capitalize;">{{ student.diet if student.diet else 'Veg' }}</div>
+            </div>
+
+            <div class="info-item" style="margin-top: 1.5rem;">
+                <div class="info-label">College / University</div>
+                <div class="info-value">{{ student.college if student.college else 'N/A' }}</div>
+                <div style="font-size: 0.9rem; color: var(--text-muted); margin-top: 0.25rem;">{{ student.university if student.university else 'N/A' }}</div>
+            </div>
+
+            <div class="info-item">
+                <div class="info-label">Admission Year</div>
+                <div class="info-value">{{ student.admission_year if student.admission_year else 'N/A' }}</div>
+            </div>
+
+            <div class="info-item">
+                <div class="info-label">Course Duration</div>
+                <div class="info-value">{{ student.course_duration if student.course_duration else 'N/A' }} Years</div>
+            </div>
+        </div>
+
+        <!-- Guardian & Documents -->
+        <div class="glass-panel" style="padding: 2rem;">
+            <h3 class="section-title">Guardian Information</h3>
+            
+            <div class="info-item">
+                <div class="info-label">Father / Mother Name</div>
+                <div class="info-value">{{ student.father_name if student.father_name else 'N/A' }} / {{ student.mother_name if student.mother_name else 'N/A' }}</div>
+            </div>
+
+            <div class="info-item">
+                <div class="info-label">Local Guardian</div>
+                <div class="info-value">{{ student.guardian_name if student.guardian_name else 'N/A' }}</div>
+            </div>
+
+            <div class="info-item">
+                <div class="info-label">Guardian Mobile / Emergency</div>
+                <div class="info-value">{{ student.guardian_mobile if student.guardian_mobile else 'N/A' }} / {{ student.emergency_contact if student.emergency_contact else 'N/A' }}</div>
+            </div>
+
+            <h3 class="section-title" style="margin-top: 2.5rem;">Identity Documents</h3>
+            
+            <div class="info-item">
+                <div class="info-label">Aadhaar Card</div>
+                <div class="info-value" style="display: flex; justify-content: space-between; align-items: center;">
+                    <span style="font-family: monospace; letter-spacing: 1px;">{{ student.aadhaar_number if student.aadhaar_number else 'N/A' }}</span>
+                    {% if student.aadhaar_path %}
+                    <a href="{{ url_for('static', filename='uploads/' + student.aadhaar_path) }}" target="_blank" class="btn-outline" style="padding: 0.25rem 0.5rem; font-size: 0.75rem;">👁️ View</a>
+                    {% endif %}
+                </div>
+            </div>
+
+            <div class="info-item">
+                <div class="info-label">Ration Card</div>
+                <div class="info-value" style="display: flex; justify-content: space-between; align-items: center;">
+                    <span style="font-family: monospace; letter-spacing: 1px;">{{ student.ration_card_number if student.ration_card_number else 'N/A' }}</span>
+                    {% if student.ration_card_path %}
+                    <a href="{{ url_for('static', filename='uploads/' + student.ration_card_path) }}" target="_blank" class="btn-outline" style="padding: 0.25rem 0.5rem; font-size: 0.75rem;">👁️ View</a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Marks Cards Section -->
+    <div class="glass-panel" style="padding: 2rem; margin-top: 1.5rem;">
+        <h3 class="section-title" style="border-bottom: none; margin-bottom: 0.5rem;">Semester Marks Cards</h3>
+        <p style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 1.5rem;">Student's uploaded academic records for verification.</p>
+        
+        {% if has_marks_cards %}
+        <div style="overflow-x: auto;">
+            <table class="marks-table">
+                <thead>
+                    <tr>
+                        <th>Semester</th>
+                        <th>Upload Date</th>
+                        <th>Extracted CGPA</th>
+                        <th>Verification Status</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for card in student.user.marks_cards %}
+                    <tr>
+                        <td><strong>Semester {{ card.semester }}</strong></td>
+                        <td>{{ card.uploaded_at.strftime('%Y-%m-%d') }}</td>
+                        <td>{{ card.extracted_cgpa if card.extracted_cgpa else 'Pending Processing' }}</td>
+                        <td>
+                            {% if card.status == 'Verified' %}
+                                <span class="badge badge-success">VERIFIED</span>
+                            {% elif card.status == 'Rejected' %}
+                                <span class="badge badge-danger">REJECTED</span>
+                            {% else %}
+                                <span class="badge badge-warning">PENDING</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <div style="display: flex; gap: 0.5rem;">
+                                <a href="{{ url_for('static', filename='uploads/' + card.file_path) }}" target="_blank" class="btn-premium" style="padding: 0.25rem 0.75rem; font-size: 0.75rem;">
+                                    View File
+                                </a>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <div style="background: rgba(0,0,0,0.02); border: 1px dashed var(--border-color); padding: 3rem; text-align: center; border-radius: 8px;">
+            <span class="material-symbols-outlined" style="font-size: 48px; color: var(--text-muted); opacity: 0.5; margin-bottom: 1rem;">description</span>
+            <p style="color: var(--text-muted); font-weight: 500;">No marks cards have been uploaded by this student yet.</p>
+        </div>
+        {% endif %}
+    </div>
+
+</div>
+{% endblock %}

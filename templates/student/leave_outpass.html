@@ -1,0 +1,262 @@
+{% extends "student/student_base.html" %}
+{% block title %}Leave & Outpass | BCWD{% endblock %}
+{% block page_title %}Leave & Outpass{% endblock %}
+
+{% block extra_head %}
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet">
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script>
+    tailwind.config = {
+        darkMode: "class",
+        theme: {
+            extend: {
+                "colors": {
+                    "primary-fixed": "#ffdbd0",
+                    "surface-container": "#f0eded",
+                    "surface-container-high": "#eae8e7",
+                    "primary-container": "#5d4037",
+                    "secondary-container": "#fed7ca",
+                    "secondary": "#75584d",
+                    "surface": "#fbf9f8",
+                    "on-primary": "#ffffff",
+                    "on-primary-container": "#d4ada1",
+                    "surface-container-low": "#f5f3f3",
+                    "error-container": "#ffdad6",
+                    "primary": "#442a22",
+                    "on-error": "#ffffff",
+                    "background": "#fbf9f8",
+                    "outline": "#827470",
+                    "outline-variant": "#d4c3be",
+                    "on-surface": "#1b1c1c",
+                    "on-surface-variant": "#504441",
+                    "on-secondary-container": "#795c51",
+                    "surface-container-lowest": "#ffffff"
+                }
+            }
+        }
+    }
+</script>
+<style>
+    .material-symbols-outlined {font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;}
+</style>
+{% endblock %}
+
+{% block content %}
+<main class="flex-1 p-6 md:p-8 overflow-x-hidden max-w-6xl mx-auto">
+    <!-- Header -->
+    <div class="flex items-center gap-3 mb-8">
+        <a href="{{ url_for('student.dashboard') }}" class="p-2 hover:bg-surface-container rounded-full transition-colors text-on-surface-variant">
+            <span class="material-symbols-outlined">arrow_back</span>
+        </a>
+        <h1 class="text-3xl font-bold text-primary">Leave & Outpass</h1>
+    </div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <!-- Leave Application Form -->
+        <div class="lg:col-span-1">
+            <div class="bg-surface rounded-xl p-6 shadow-[0px_4px_20px_rgba(93,64,55,0.08)] border border-outline-variant">
+                <h2 class="text-xl font-bold text-primary mb-6 flex items-center gap-2">
+                    <span class="material-symbols-outlined">post_add</span>
+                    New Request
+                </h2>
+                {% if has_active_leave %}
+                <div class="mb-4 p-4 bg-yellow-50 border border-yellow-200 rounded-lg flex items-start gap-3">
+                    <span class="material-symbols-outlined text-yellow-600">info</span>
+                    <div>
+                        <p class="text-sm text-yellow-800 font-semibold">New requests disabled</p>
+                        <p class="text-sm text-yellow-700 mt-1">You already have an active or pending leave. Please use the "Extend Leave" option in the history table if you need to stay longer.</p>
+                    </div>
+                </div>
+                {% endif %}
+
+                <form id="leave-form" method="POST" action="{{ url_for('student.leave_outpass') }}" enctype="multipart/form-data">
+                    <fieldset {% if has_active_leave %}disabled class="opacity-60"{% endif %} class="space-y-4">
+                        <div>
+                            <label class="block text-sm font-semibold text-on-surface-variant mb-1">Leave Type *</label>
+                            <select id="leave_type" name="leave_type" required class="w-full rounded-lg border-outline-variant bg-surface-container-lowest focus:border-primary focus:ring-0 text-sm">
+                                <option value="holiday">Holiday</option>
+                                <option value="weekend">Weekend</option>
+                                <option value="festival">Festival</option>
+                                <option value="outpass">Outpass (Few Hours)</option>
+                                <option value="nursing_duty">Nursing Duty (Late Pass)</option>
+                                <option value="college_fest">College Fest</option>
+                                <option value="other">Other</option>
+                            </select>
+                        </div>
+
+                        <div class="grid grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-sm font-semibold text-on-surface-variant mb-1">From Date *</label>
+                                <input type="date" name="from_date" required class="w-full rounded-lg border-outline-variant bg-surface-container-lowest focus:border-primary focus:ring-0 text-sm">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-semibold text-on-surface-variant mb-1">To Date *</label>
+                                <input type="date" name="to_date" required class="w-full rounded-lg border-outline-variant bg-surface-container-lowest focus:border-primary focus:ring-0 text-sm">
+                            </div>
+                        </div>
+
+                        <div id="nursing-fields" class="hidden space-y-4 bg-surface-container-low p-4 rounded-lg border border-outline-variant/50">
+                            <div>
+                                <label class="block text-sm font-semibold text-on-surface-variant mb-1">Shift Type *</label>
+                                <select id="shift_type" name="shift_type" class="w-full rounded-lg border-outline-variant bg-surface-container-lowest focus:border-primary focus:ring-0 text-sm">
+                                    <option value="Day Duty">Day Duty</option>
+                                    <option value="Night Duty">Night Duty</option>
+                                    <option value="General Duty">General Duty</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-semibold text-on-surface-variant mb-1">Expected Return Time *</label>
+                                <input type="time" id="expected_return_time" name="expected_return_time" class="w-full rounded-lg border-outline-variant bg-surface-container-lowest focus:border-primary focus:ring-0 text-sm">
+                            </div>
+                        </div>
+
+                        <div id="fest-fields" class="hidden space-y-4 bg-surface-container-low p-4 rounded-lg border border-outline-variant/50">
+                            <div>
+                                <label class="block text-sm font-semibold text-on-surface-variant mb-1">HOD Signature Letter *</label>
+                                <input type="file" id="attachment" name="attachment" accept="image/*,.pdf" class="w-full text-sm text-on-surface-variant file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-primary-fixed file:text-primary hover:file:bg-secondary-container transition">
+                                <p class="text-xs text-on-surface-variant mt-1">Upload the official letter signed by your HOD. It will be automatically scanned.</p>
+                            </div>
+                        </div>
+
+                        <div>
+                            <label class="block text-sm font-semibold text-on-surface-variant mb-1">Reason *</label>
+                            <textarea name="reason" required rows="3" class="w-full rounded-lg border-outline-variant bg-surface-container-lowest focus:border-primary focus:ring-0 text-sm resize-none" placeholder="Provide a detailed reason..."></textarea>
+                        </div>
+
+                        <button type="submit" class="w-full bg-primary text-on-primary py-3 rounded-lg font-bold hover:opacity-90 transition flex justify-center items-center gap-2 mt-4 disabled:cursor-not-allowed">
+                            <span class="material-symbols-outlined">send</span>
+                            Submit Request
+                        </button>
+                    </fieldset>
+                </form>
+            </div>
+        </div>
+
+        <!-- History Table -->
+        <div class="lg:col-span-2">
+            <div class="bg-surface rounded-xl p-6 shadow-[0px_4px_20px_rgba(93,64,55,0.08)] border border-outline-variant h-full">
+                <h2 class="text-xl font-bold text-primary mb-6 flex items-center gap-2">
+                    <span class="material-symbols-outlined">history</span>
+                    Request History
+                </h2>
+
+                {% if history %}
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left border-collapse">
+                        <thead>
+                            <tr class="border-b border-outline-variant">
+                                <th class="py-3 px-4 text-sm font-bold text-on-surface-variant">Dates</th>
+                                <th class="py-3 px-4 text-sm font-bold text-on-surface-variant">Type</th>
+                                <th class="py-3 px-4 text-sm font-bold text-on-surface-variant">Reason</th>
+                                <th class="py-3 px-4 text-sm font-bold text-on-surface-variant text-right">Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for request in history %}
+                            <tr class="border-b border-outline-variant/50 hover:bg-surface-container-low transition-colors group last:border-0">
+                                <td class="py-4 px-4 text-sm text-on-surface whitespace-nowrap">
+                                    <div class="font-bold">{{ request.from_date }}</div>
+                                    <div class="text-xs text-on-surface-variant mt-0.5">to {{ request.to_date }}</div>
+                                </td>
+                                <td class="py-4 px-4 text-sm text-on-surface">
+                                    <span class="capitalize">{{ request.leave_type }}</span>
+                                </td>
+                                <td class="py-4 px-4 text-sm text-on-surface max-w-[200px] truncate" title="{{ request.reason }}">
+                                    {{ request.reason }}
+                                </td>
+                                <td class="py-4 px-4 text-right">
+                                    {% if request.status|lower == 'approved' %}
+                                        <div class="flex flex-col items-end gap-1">
+                                            <span class="bg-green-100 text-green-800 text-[10px] uppercase font-bold px-3 py-1 rounded-full border border-green-200">Approved</span>
+                                            {% if not request.is_returned %}
+                                            <div class="flex gap-2 mt-1">
+                                                <a href="{{ url_for('student.return_confirmation', leave_id=request.id) }}" class="text-[10px] font-bold text-primary hover:underline">Confirm Return</a>
+                                                <span class="text-[10px] text-on-surface-variant">|</span>
+                                                <button type="button" onclick="document.getElementById('extend-modal-{{ request.id }}').classList.remove('hidden')" class="text-[10px] font-bold text-blue-600 hover:underline">Extend Leave</button>
+                                            </div>
+                                            
+                                            <!-- Extend Modal -->
+                                            <div id="extend-modal-{{ request.id }}" class="hidden fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4" style="text-align: left;">
+                                                <div class="bg-surface rounded-xl p-6 shadow-xl max-w-md w-full border border-outline-variant">
+                                                    <h3 class="text-xl font-bold text-primary mb-4">Extend Leave Return Date</h3>
+                                                    <p class="text-sm text-on-surface-variant mb-4">Original return date: {{ request.to_date }}</p>
+                                                    <form method="POST" action="{{ url_for('student.extend_leave', leave_id=request.id) }}" class="space-y-4">
+                                                        <div>
+                                                            <label class="block text-sm font-semibold text-on-surface-variant mb-1">New Return Date *</label>
+                                                            <input type="date" name="new_date" required min="{{ request.to_date }}" class="w-full rounded-lg border-outline-variant bg-surface-container-lowest focus:border-primary text-sm">
+                                                        </div>
+                                                        <div>
+                                                            <label class="block text-sm font-semibold text-on-surface-variant mb-1">Reason for Extension *</label>
+                                                            <textarea name="reason" required rows="3" class="w-full rounded-lg border-outline-variant bg-surface-container-lowest focus:border-primary text-sm resize-none" placeholder="E.g., Train cancelled..."></textarea>
+                                                        </div>
+                                                        <div class="flex gap-3 justify-end mt-6">
+                                                            <button type="button" onclick="document.getElementById('extend-modal-{{ request.id }}').classList.add('hidden')" class="px-4 py-2 text-sm font-bold text-on-surface-variant hover:bg-surface-container rounded-lg transition">Cancel</button>
+                                                            <button type="submit" class="px-4 py-2 text-sm font-bold bg-primary text-on-primary rounded-lg hover:opacity-90 transition">Confirm Extension</button>
+                                                        </div>
+                                                    </form>
+                                                </div>
+                                            </div>
+                                            {% else %}
+                                            <span class="text-[10px] font-bold text-on-surface-variant flex items-center mt-1"><span class="material-symbols-outlined text-[12px] mr-1">check_circle</span>Returned</span>
+                                            {% endif %}
+                                        </div>
+                                    {% elif request.status|lower == 'rejected' %}
+                                        <span class="bg-red-100 text-red-800 text-[10px] uppercase font-bold px-3 py-1 rounded-full border border-red-200">Rejected</span>
+                                    {% else %}
+                                        <span class="bg-yellow-100 text-yellow-800 text-[10px] uppercase font-bold px-3 py-1 rounded-full border border-yellow-200">Pending</span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <div class="text-center py-12 text-on-surface-variant">
+                    <span class="material-symbols-outlined text-5xl mb-3 block opacity-40">assignment_turned_in</span>
+                    <p class="font-medium text-lg text-on-surface">No leave history</p>
+                    <p class="text-sm mt-1">Submit a new request to see it appear here.</p>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</main>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const leaveTypeSelect = document.getElementById('leave_type');
+        const nursingFields = document.getElementById('nursing-fields');
+        const festFields = document.getElementById('fest-fields');
+        const shiftType = document.getElementById('shift_type');
+        const returnTime = document.getElementById('expected_return_time');
+        const attachment = document.getElementById('attachment');
+        
+        function toggleFields() {
+            const type = leaveTypeSelect.value;
+            if (type === 'nursing_duty') {
+                nursingFields.classList.remove('hidden');
+                shiftType.required = true;
+                returnTime.required = true;
+            } else {
+                nursingFields.classList.add('hidden');
+                shiftType.required = false;
+                returnTime.required = false;
+            }
+            
+            if (type === 'college_fest') {
+                festFields.classList.remove('hidden');
+                attachment.required = true;
+            } else {
+                festFields.classList.add('hidden');
+                attachment.required = false;
+            }
+        }
+        
+        if (leaveTypeSelect) {
+            leaveTypeSelect.addEventListener('change', toggleFields);
+            toggleFields();
+        }
+    });
+</script>
+{% endblock %}

@@ -1,0 +1,85 @@
+{% extends "base.html" %}
+{% block extra_head %}
+  <link href="{{ url_for('static', filename='css/student/login.css') }}" rel="stylesheet">
+{% endblock %}
+{% block body %}
+
+<!-- Header -->
+<header class="student-header sticky-top py-3">
+    <div class="container d-flex justify-content-between align-items-center">
+        <h1 class="h5 mb-0 fw-bold text-primary-custom">BCWD - Student Registration</h1>
+        <span class="d-none d-md-inline text-muted small">Register</span>
+    </div>
+</header>
+
+<!-- Main -->
+<main class="flex-grow-1 d-flex align-items-center justify-content-center pattern-bg px-3 py-5 student-login">
+    <div class="w-100" style="max-width: 440px;">
+        <div class="glass-card rounded-4 p-4 p-md-5">
+            <div class="text-center mb-4">
+                <div class="icon-badge mx-auto mb-3">
+                    <span class="material-symbols-outlined fs-3 text-primary-custom">person_add</span>
+                </div>
+                <h2 class="heading-lg text-primary-custom">Create New Student Account</h2>
+                <p class="text-muted small mt-1">Enter email and a password to register.</p>
+            </div>
+
+            {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, msg in messages %}
+                    <div class="alert alert-{{ category }} py-2 small">{{ msg }}</div>
+                {% endfor %}
+            {% endif %}
+            {% endwith %}
+
+            <form method="POST" action="{{ url_for('auth.register_student') }}" id="registerForm" novalidate>
+                {{ form.hidden_tag() }}
+                <div class="mb-3">
+                    {{ form.email.label(class="form-label fw-semibold small") }}
+                    <div class="input-group">
+                        <span class="input-group-text bg-light border-end-0"><span class="material-symbols-outlined text-muted">email</span></span>
+                        {{ form.email(class="form-control border-start-0 bg-light", placeholder="your.email@example.com") }}
+                    </div>
+                    {% if form.email.errors %}
+                        <div class="text-danger small mt-1">{{ form.email.errors[0] }}</div>
+                    {% endif %}
+                </div>
+                <div class="mb-3">
+                    {{ form.password.label(class="form-label fw-semibold small") }}
+                    <div class="input-group">
+                        <span class="input-group-text bg-light border-end-0"><span class="material-symbols-outlined text-muted">lock</span></span>
+                        {{ form.password(class="form-control border-start-0 bg-light", placeholder="Password") }}
+                    </div>
+                    {% if form.password.errors %}
+                        <div class="text-danger small mt-1">{{ form.password.errors[0] }}</div>
+                    {% endif %}
+                </div>
+                <div class="mb-3">
+                    {{ form.confirm_password.label(class="form-label fw-semibold small") }}
+                    <div class="input-group">
+                        <span class="input-group-text bg-light border-end-0"><span class="material-symbols-outlined text-muted">lock</span></span>
+                        {{ form.confirm_password(class="form-control border-start-0 bg-light", placeholder="Confirm Password") }}
+                    </div>
+                    {% if form.confirm_password.errors %}
+                        <div class="text-danger small mt-1">{{ form.confirm_password.errors[0] }}</div>
+                    {% endif %}
+                </div>
+                <button type="submit" class="btn btn-primary w-100 py-3 fw-bold" id="registerBtn">Register</button>
+            </form>
+
+            <div class="mt-4 text-center">
+                <a href="{{ url_for('auth.login_student') }}" class="small text-primary-custom text-decoration-none">← Back to Login</a>
+            </div>
+        </div>
+    </div>
+</main>
+
+{% endblock %}
+{% block extra_js %}
+<script>
+    document.getElementById('registerForm').addEventListener('submit', function(){
+        const btn = document.getElementById('registerBtn');
+        btn.disabled = true; btn.textContent = 'Creating...';
+    });
+</script>
+{% endblock %}

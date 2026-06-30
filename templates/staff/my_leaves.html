@@ -1,0 +1,88 @@
+{% extends "staff/staff_base.html" %}
+
+{% block title %}My Leave Applications | BCWD{% endblock %}
+{% block page_title %}My Leave Applications{% endblock %}
+
+{% block content %}
+<div class="grid-cols-2" style="align-items: start;">
+    <!-- Apply for Leave Form -->
+    <div class="glass-panel" style="padding: 2rem;">
+        <h3 style="font-size: 1.25rem; font-weight: 700; color: var(--primary); margin-bottom: 1.5rem; display: flex; align-items: center; gap: 0.5rem;">
+            <span class="material-symbols-outlined">edit_calendar</span> Apply for Leave
+        </h3>
+        
+        <form method="POST" action="{{ url_for('staff.my_leaves') }}">
+            <div class="form-group">
+                <label class="form-label">Leave Type</label>
+                <select name="leave_type" class="form-control" required>
+                    <option value="casual">Casual Leave</option>
+                    <option value="sick">Sick Leave</option>
+                    <option value="emergency">Emergency</option>
+                    <option value="vacation">Vacation</option>
+                </select>
+            </div>
+            
+            <div class="grid-cols-2" style="gap: 1rem;">
+                <div class="form-group">
+                    <label class="form-label">From Date</label>
+                    <input type="date" name="from_date" class="form-control" required />
+                </div>
+                <div class="form-group">
+                    <label class="form-label">To Date</label>
+                    <input type="date" name="to_date" class="form-control" required />
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label">Reason</label>
+                <textarea name="reason" class="form-control" rows="4" placeholder="Briefly explain your reason for leave..." required></textarea>
+            </div>
+            
+            <button type="submit" class="btn-premium" style="width: 100%; display: flex; justify-content: center; gap: 0.5rem;">
+                <span class="material-symbols-outlined">send</span> Submit Application
+            </button>
+        </form>
+    </div>
+
+    <!-- My Leave History -->
+    <div class="glass-panel" style="padding: 2rem;">
+        <h3 style="font-size: 1.25rem; font-weight: 700; color: var(--primary); margin-bottom: 1.5rem; display: flex; align-items: center; gap: 0.5rem;">
+            <span class="material-symbols-outlined">history</span> My Requests History
+        </h3>
+        
+        {% if my_leave_history %}
+            <div style="display: flex; flex-direction: column; gap: 1rem;">
+                {% for req in my_leave_history %}
+                <div style="border: 1px solid var(--border-color); border-radius: 8px; padding: 1rem; background: rgba(0,0,0,0.01);">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
+                        <span style="font-weight: 700; text-transform: capitalize; color: var(--primary);">{{ req.leave_type }} Leave</span>
+                        
+                        {% if req.status == 'Pending' %}
+                            <span class="badge badge-warning" style="font-size: 0.75rem;">Pending</span>
+                        {% elif req.status == 'Approved' %}
+                            <span class="badge badge-success" style="font-size: 0.75rem;">Approved</span>
+                        {% else %}
+                            <span class="badge badge-danger" style="font-size: 0.75rem;">Rejected</span>
+                        {% endif %}
+                    </div>
+                    
+                    <div style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 0.5rem;">
+                        <span class="material-symbols-outlined" style="font-size: 14px; vertical-align: middle;">calendar_today</span> 
+                        {{ req.from_date.strftime('%b %d') }} - {{ req.to_date.strftime('%b %d, %Y') }}
+                    </div>
+                    
+                    <p style="font-size: 0.9rem; margin: 0; padding-top: 0.5rem; border-top: 1px dashed var(--border-color);">
+                        {{ req.reason }}
+                    </p>
+                </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <div style="text-align: center; padding: 3rem 1rem; color: var(--text-muted);">
+                <span class="material-symbols-outlined" style="font-size: 48px; opacity: 0.5; margin-bottom: 1rem;">event_available</span>
+                <p>You haven't submitted any leave requests yet.</p>
+            </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

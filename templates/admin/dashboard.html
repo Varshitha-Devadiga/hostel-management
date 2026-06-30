@@ -1,0 +1,154 @@
+{% extends "admin/admin_base.html" %}
+
+{% block title %}Dashboard | Warden Portal{% endblock %}
+{% block page_title %}Dashboard Overview{% endblock %}
+
+{% block content %}
+<!-- KPI Bento Grid -->
+<style>
+    .kpi-card {
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+    .kpi-card:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 8px 24px rgba(0,0,0,0.08) !important;
+    }
+</style>
+<div class="grid-cols-4" style="margin-bottom: 2rem;">
+    <a href="{{ url_for('admin.manage_students') }}" class="glass-panel kpi-card" style="padding: 1.5rem; display: flex; flex-direction: column; justify-content: center; text-decoration: none; cursor: pointer; color: inherit;">
+        <p style="font-size: 0.85rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase;">Total Students</p>
+        <h4 style="font-size: 2.5rem; font-weight: 700; color: var(--primary); margin-top: 0.5rem;">{{ total_students|default(0) }}</h4>
+    </a>
+    <a href="{{ url_for('admin.manage_students') }}" class="glass-panel kpi-card" style="padding: 1.5rem; display: flex; flex-direction: column; justify-content: center; border-bottom: 4px solid var(--success); text-decoration: none; cursor: pointer; color: inherit;">
+        <p style="font-size: 0.85rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase;">Present Today</p>
+        <h4 style="font-size: 2.5rem; font-weight: 700; color: var(--success); margin-top: 0.5rem;">{{ present_today|default(0) }}</h4>
+    </a>
+    <a href="{{ url_for('admin.manage_leaves') }}" class="glass-panel kpi-card" style="padding: 1.5rem; display: flex; flex-direction: column; justify-content: center; border-bottom: 4px solid var(--warning); text-decoration: none; cursor: pointer; color: inherit;">
+        <p style="font-size: 0.85rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase;">On Leave</p>
+        <h4 style="font-size: 2.5rem; font-weight: 700; color: var(--warning); margin-top: 0.5rem;">{{ on_leave_today|default(0) }}</h4>
+    </a>
+    <a href="{{ url_for('admin.manage_leaves') }}" class="glass-panel kpi-card" style="padding: 1.5rem; display: flex; flex-direction: column; justify-content: center; border-bottom: 4px solid var(--info); text-decoration: none; cursor: pointer; color: inherit;">
+        <p style="font-size: 0.85rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase;">Pending Req</p>
+        <h4 style="font-size: 2.5rem; font-weight: 700; color: var(--info); margin-top: 0.5rem;">{{ pending_reg|default(0) }}</h4>
+    </a>
+</div>
+
+<div class="grid-cols-2" style="margin-bottom: 2rem;">
+    <!-- Course Analysis -->
+    <div class="glass-panel" style="padding: 0;">
+        <div style="padding: 1.5rem; border-bottom: 1px solid var(--border-color);">
+            <h3 style="font-size: 1.2rem; color: var(--primary); font-weight: 700;">Students by Course</h3>
+        </div>
+        <div style="padding: 1.5rem;">
+            <div style="display: flex; justify-content: space-between; padding: 0.75rem 0; border-bottom: 1px dashed var(--border-color);">
+                <span style="color: var(--text-muted); font-weight: 500;">Bachelor of Arts (BA)</span>
+                <span style="font-weight: 700; color: var(--primary);">120</span>
+            </div>
+            <div style="display: flex; justify-content: space-between; padding: 0.75rem 0; border-bottom: 1px dashed var(--border-color);">
+                <span style="color: var(--text-muted); font-weight: 500;">Bachelor of Science (BSc)</span>
+                <span style="font-weight: 700; color: var(--primary);">180</span>
+            </div>
+            <div style="display: flex; justify-content: space-between; padding: 0.75rem 0; border-bottom: 1px dashed var(--border-color);">
+                <span style="color: var(--text-muted); font-weight: 500;">Bachelor of Commerce (BCom)</span>
+                <span style="font-weight: 700; color: var(--primary);">150</span>
+            </div>
+            <div style="display: flex; justify-content: space-between; padding: 0.75rem 0;">
+                <span style="color: var(--text-muted); font-weight: 500;">Post-Graduate (MA/MSc)</span>
+                <span style="font-weight: 700; color: var(--primary);">32</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Food Preference -->
+    <div class="glass-panel" style="display: flex; flex-direction: column; padding: 0;">
+        <div style="padding: 1.5rem; border-bottom: 1px solid var(--border-color);">
+            <h3 style="font-size: 1.2rem; color: var(--primary); font-weight: 700;">Food Preference Distribution</h3>
+        </div>
+        <div style="padding: 1.5rem; flex: 1; display: flex; align-items: center; justify-content: center; min-height: 250px;">
+            <canvas id="dietChart" style="max-height: 250px;"></canvas>
+        </div>
+    </div>
+</div>
+
+<!-- Recent Activities Table -->
+<div class="glass-panel" style="padding: 0; overflow: hidden;">
+    <div style="padding: 1.5rem; background: var(--primary); color: white; display: flex; justify-content: space-between; align-items: center;">
+        <h3 style="font-size: 1.2rem; font-weight: 700; margin: 0;">Recent Student Activities</h3>
+        <a href="#" class="btn-outline" style="border-color: rgba(255,255,255,0.3); color: white; padding: 0.4rem 1rem; font-size: 0.85rem;">View All</a>
+    </div>
+    <div style="overflow-x: auto;">
+        <table class="premium-table">
+            <thead>
+                <tr>
+                    <th>Student</th>
+                    <th>Type</th>
+                    <th>Duration</th>
+                    <th>Reason</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for leave in recent_leaves %}
+                <tr>
+                    <td style="font-weight: 700; color: var(--primary);">
+                        {{ leave.user.student_profile.full_name if leave.user and leave.user.student_profile else 'Unknown Student' }}
+                    </td>
+                    <td style="font-size: 0.9rem; color: var(--text-muted); text-transform: capitalize;">
+                        {{ leave.leave_type }}
+                    </td>
+                    <td style="font-size: 0.9rem; color: var(--text-muted);">{{ leave.from_date }} to {{ leave.to_date }}</td>
+                    <td style="font-size: 0.9rem; color: var(--text-muted); max-width: 200px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">{{ leave.reason }}</td>
+                    <td>
+                        {% if leave.status == 'Pending' %}
+                            <span class="badge badge-warning">Pending</span>
+                        {% elif leave.status == 'Approved' %}
+                            <span class="badge badge-success">Approved</span>
+                        {% else %}
+                            <span class="badge badge-danger">{{ leave.status }}</span>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% else %}
+                <tr>
+                    <td colspan="4" style="text-align: center; padding: 2rem; color: var(--text-muted);">No recent activities found.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    const colors = {
+        primary: '#2C1A14',
+        secondary: '#52382F',
+        accent: '#D4AF37',
+        surfaceHigh: 'rgba(44, 26, 20, 0.1)'
+    };
+
+    const ctxDiet = document.getElementById('dietChart');
+    if (ctxDiet) {
+        new Chart(ctxDiet.getContext('2d'), {
+            type: 'doughnut',
+            data: {
+                labels: ['Vegetarian', 'Non-Vegetarian'],
+                datasets: [{
+                    data: [180, 170],
+                    backgroundColor: ['#22c55e', '#ef4444'],
+                    borderWidth: 0,
+                    cutout: '75%'
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { position: 'bottom', labels: { usePointStyle: true, padding: 20, font: {family: 'Outfit'} } }
+                }
+            }
+        });
+    }
+</script>
+{% endblock %}

@@ -1,0 +1,173 @@
+{% extends "staff/staff_base.html" %}
+
+{% block title %}My Profile | Staff Portal{% endblock %}
+{% block page_title %}My Profile{% endblock %}
+
+{% block content %}
+<div class="grid-cols-3" style="gap: 2rem;">
+    
+    <!-- Left Column: Profile Overview & Verification -->
+    <div style="display: flex; flex-direction: column; gap: 1.5rem;">
+        
+        <!-- Profile Card -->
+        <div class="glass-panel" style="padding: 2rem; text-align: center; display: flex; flex-direction: column; align-items: center;">
+            <div style="position: relative; width: 120px; height: 120px; margin-bottom: 1rem;">
+                <div style="width: 100%; height: 100%; border-radius: 50%; background: var(--primary-light); color: var(--accent); display: flex; align-items: center; justify-content: center; overflow: hidden; border: 4px solid white; box-shadow: var(--shadow-sm);">
+                    {% if profile and profile.photo_path %}
+                        <img src="{{ url_for('static', filename='uploads/staff/' + profile.photo_path) }}" alt="Profile Photo" style="width:100%; height:100%; object-fit:cover;">
+                    {% else %}
+                        <span class="material-symbols-outlined" style="font-size: 64px;">soup_kitchen</span>
+                    {% endif %}
+                </div>
+                <button style="position: absolute; bottom: 0; right: 0; width: 36px; height: 36px; border-radius: 50%; background: var(--primary); color: white; border: 3px solid white; cursor: pointer; display: flex; align-items: center; justify-content: center; box-shadow: var(--shadow-sm);">
+                    <span class="material-symbols-outlined" style="font-size: 18px;">edit</span>
+                </button>
+            </div>
+            <h2 style="font-size: 1.5rem; font-weight: 700; color: var(--primary); margin-bottom: 0.25rem;">{{ profile.full_name if profile and profile.full_name else fallback_name }}</h2>
+            <p style="font-size: 0.95rem; font-weight: 600; color: var(--text-muted); margin-bottom: 1.5rem;">{{ profile.specialty if profile else 'Kitchen Management' }}</p>
+            
+            <div style="display: flex; gap: 0.5rem; justify-content: center;">
+                <span class="badge badge-success" style="display: flex; align-items: center; gap: 0.25rem;">
+                    <span style="width: 6px; height: 6px; border-radius: 50%; background: currentColor;"></span> ACTIVE
+                </span>
+                <span class="badge" style="background: rgba(0,0,0,0.05); color: var(--text-muted);">STAFF ID: FS{{ '%04d' % current_user.id }}</span>
+            </div>
+        </div>
+
+        <!-- Verification Status -->
+        <div class="glass-panel" style="padding: 1.5rem;">
+            <h3 style="font-size: 1.1rem; font-weight: 700; color: var(--primary); margin-bottom: 1.5rem; border-bottom: 1px solid var(--border-color); padding-bottom: 0.75rem;">Verification Status</h3>
+            
+            <div style="display: flex; flex-direction: column; gap: 1rem;">
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <div style="display: flex; align-items: center; gap: 0.75rem; color: var(--text-muted); font-weight: 600;">
+                        <span class="material-symbols-outlined" style="color: var(--primary);">badge</span> Aadhaar Card
+                    </div>
+                    {% if profile and profile.aadhaar_verified %}
+                    <span class="badge badge-success" style="font-size: 0.75rem;">✔ VERIFIED</span>
+                    {% else %}
+                    <span class="badge badge-warning" style="font-size: 0.75rem;">⏳ PENDING</span>
+                    {% endif %}
+                </div>
+                
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <div style="display: flex; align-items: center; gap: 0.75rem; color: var(--text-muted); font-weight: 600;">
+                        <span class="material-symbols-outlined" style="color: var(--warning);">contact_page</span> Ration Card
+                    </div>
+                    {% if profile and profile.ration_verified %}
+                    <span class="badge badge-success" style="font-size: 0.75rem;">✔ VERIFIED</span>
+                    {% else %}
+                    <span class="badge badge-warning" style="font-size: 0.75rem;">⏳ PENDING</span>
+                    {% endif %}
+                </div>
+            </div>
+            
+            <button class="btn btn-outline" style="width: 100%; margin-top: 1.5rem;">Manage Documents</button>
+        </div>
+    </div>
+
+    <!-- Right Column: Personal Information Form -->
+    <div style="grid-column: span 2; display: flex; flex-direction: column; gap: 1.5rem;">
+        <div class="glass-panel" style="padding: 2rem;">
+            <form action="{{ url_for('staff.profile_view') }}" method="POST" enctype="multipart/form-data">
+                <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border-color); padding-bottom: 1rem; margin-bottom: 1.5rem;">
+                    <h3 style="font-size: 1.25rem; font-weight: 700; color: var(--primary); margin: 0;">Personal Information</h3>
+                    <button type="submit" class="btn btn-primary" style="display: flex; align-items: center; gap: 0.5rem;">
+                        <span class="material-symbols-outlined" style="font-size: 18px;">save</span> SAVE CHANGES
+                    </button>
+                </div>
+
+                <div class="grid-cols-2" style="gap: 1.5rem; margin-bottom: 1.5rem;">
+                    <div>
+                        <label style="display: block; font-size: 0.85rem; font-weight: 700; color: var(--text-muted); margin-bottom: 0.5rem;">FULL NAME</label>
+                        <input type="text" name="full_name" value="{{ profile.full_name if profile else '' }}" class="form-control {% if errors and errors.full_name %}is-invalid{% endif %}" placeholder="Name as per Aadhaar">
+                        {% if errors and errors.full_name %}<small style="color: var(--danger); margin-top: 0.25rem; display: block;">{{ errors.full_name }}</small>{% endif %}
+                    </div>
+                    <div>
+                        <label style="display: block; font-size: 0.85rem; font-weight: 700; color: var(--text-muted); margin-bottom: 0.5rem;">MARITAL STATUS</label>
+                        <select name="marital_status" class="form-control {% if errors and errors.marital_status %}is-invalid{% endif %}">
+                            <option value="">Select Status</option>
+                            <option value="Unmarried" {% if profile and profile.marital_status == 'Unmarried' %}selected{% endif %}>Unmarried</option>
+                            <option value="Married" {% if profile and profile.marital_status == 'Married' %}selected{% endif %}>Married</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="grid-cols-2" style="gap: 1.5rem; margin-bottom: 1.5rem;">
+                    <div>
+                        <label style="display: block; font-size: 0.85rem; font-weight: 700; color: var(--text-muted); margin-bottom: 0.5rem;">MOBILE NUMBER</label>
+                        <div style="display: flex;">
+                            <span style="background: rgba(0,0,0,0.05); border: 1px solid var(--border-color); border-right: none; padding: 0.75rem 1rem; border-radius: 8px 0 0 8px; color: var(--text-muted); font-weight: 600;">+91</span>
+                            <input type="text" name="phone" value="{{ profile.phone if profile and profile.phone else '' }}" class="form-control {% if errors and errors.phone %}is-invalid{% endif %}" style="border-radius: 0 8px 8px 0;" maxlength="10" pattern="[0-9]{10}" title="Please enter exactly 10 digits" oninput="this.value = this.value.replace(/[^0-9]/g, '').slice(0, 10);">
+                        </div>
+                    </div>
+                    <div>
+                        <label style="display: block; font-size: 0.85rem; font-weight: 700; color: var(--text-muted); margin-bottom: 0.5rem;">EMAIL ADDRESS</label>
+                        <input type="email" value="{{ current_user.email }}" class="form-control" disabled style="background-color: var(--background-color); color: var(--text-muted); cursor: not-allowed; opacity: 0.7;">
+                        <small style="color: var(--text-muted); margin-top: 0.25rem; display: block;">Email is used for login and cannot be changed.</small>
+                    </div>
+                </div>
+
+                <div style="margin-bottom: 1.5rem;">
+                    <label style="display: block; font-size: 0.85rem; font-weight: 700; color: var(--text-muted); margin-bottom: 0.5rem;">RESIDENTIAL ADDRESS</label>
+                    <textarea name="address" class="form-control {% if errors and errors.address %}is-invalid{% endif %}" rows="3" style="resize: vertical;">{{ profile.address if profile and profile.address else '' }}</textarea>
+                </div>
+
+                <div style="margin-bottom: 1.5rem; padding: 1.5rem; border: 1px dashed var(--border-color); border-radius: 8px; background: rgba(0,0,0,0.02);">
+                    <label style="display: block; font-size: 0.85rem; font-weight: 700; color: var(--text-muted); margin-bottom: 0.5rem;">
+                        PASSPORT PHOTO (PROFILE PICTURE)
+                        {% if profile and profile.photo_path %}
+                        <span class="badge badge-success" style="float: right; font-size: 0.7rem; padding: 0.1rem 0.5rem;">✔ Photo Uploaded</span>
+                        {% endif %}
+                    </label>
+                    <input type="file" name="photo" accept="image/*" class="form-control" style="background: white;">
+                    <small style="color: var(--text-muted); margin-top: 0.5rem; display: block;">
+                        {% if profile and profile.photo_path %}
+                        You already have a profile picture uploaded. Select a new file only if you want to replace it.
+                        {% else %}
+                        Upload a clear, recent passport-size photograph. This will be displayed on your profile.
+                        {% endif %}
+                    </small>
+                </div>
+            </form>
+        </div>
+
+        <!-- Document Uploader Row -->
+        <div class="grid-cols-2" style="gap: 1.5rem;">
+            <form action="{{ url_for('staff.profile_view') }}" method="POST" enctype="multipart/form-data">
+                <label for="aadhaar_upload" style="display: block; width: 100%;">
+                    <div class="glass-panel" style="padding: 2rem; text-align: center; border: 2px dashed {% if profile and profile.aadhaar_verified %}var(--success){% else %}var(--border-color){% endif %}; cursor: pointer; transition: var(--transition);" onmouseover="this.style.borderColor='var(--primary)'" onmouseout="this.style.borderColor='{% if profile and profile.aadhaar_verified %}var(--success){% else %}var(--border-color){% endif %}'">
+                        {% if profile and profile.aadhaar_verified %}
+                        <span class="material-symbols-outlined" style="font-size: 48px; color: var(--success); margin-bottom: 1rem;">verified</span>
+                        <h4 style="font-size: 1.1rem; font-weight: 700; color: var(--success); margin-bottom: 0.5rem;">Aadhaar Verified</h4>
+                        <p style="font-size: 0.85rem; color: var(--text-muted); margin: 0;">Click to update document</p>
+                        {% else %}
+                        <span class="material-symbols-outlined" style="font-size: 48px; color: var(--primary); margin-bottom: 1rem; opacity: 0.5;">cloud_upload</span>
+                        <h4 style="font-size: 1.1rem; font-weight: 700; color: var(--primary); margin-bottom: 0.5rem;">Update Aadhaar</h4>
+                        <p style="font-size: 0.85rem; color: var(--text-muted); margin: 0;">Upload a clear PDF or JPG scan</p>
+                        {% endif %}
+                        <input type="file" id="aadhaar_upload" name="aadhaar" style="display:none;" onchange="this.form.submit()">
+                    </div>
+                </label>
+            </form>
+            
+            <form action="{{ url_for('staff.profile_view') }}" method="POST" enctype="multipart/form-data">
+                <label for="ration_upload" style="display: block; width: 100%;">
+                    <div class="glass-panel" style="padding: 2rem; text-align: center; border: 2px dashed {% if profile and profile.ration_verified %}var(--success){% else %}var(--border-color){% endif %}; cursor: pointer; transition: var(--transition);" onmouseover="this.style.borderColor='var(--primary)'" onmouseout="this.style.borderColor='{% if profile and profile.ration_verified %}var(--success){% else %}var(--border-color){% endif %}'">
+                        {% if profile and profile.ration_verified %}
+                        <span class="material-symbols-outlined" style="font-size: 48px; color: var(--success); margin-bottom: 1rem;">verified</span>
+                        <h4 style="font-size: 1.1rem; font-weight: 700; color: var(--success); margin-bottom: 0.5rem;">Ration Card Verified</h4>
+                        <p style="font-size: 0.85rem; color: var(--text-muted); margin: 0;">Click to update document</p>
+                        {% else %}
+                        <span class="material-symbols-outlined" style="font-size: 48px; color: var(--primary); margin-bottom: 1rem; opacity: 0.5;">folder_open</span>
+                        <h4 style="font-size: 1.1rem; font-weight: 700; color: var(--primary); margin-bottom: 0.5rem;">Update Ration Card</h4>
+                        <p style="font-size: 0.85rem; color: var(--text-muted); margin: 0;">Upload the latest version</p>
+                        {% endif %}
+                        <input type="file" id="ration_upload" name="ration_card" style="display:none;" onchange="this.form.submit()">
+                    </div>
+                </label>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

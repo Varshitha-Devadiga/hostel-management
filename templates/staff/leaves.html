@@ -1,0 +1,146 @@
+{% extends "staff/staff_base.html" %}
+
+{% block title %}Leave Summary | Staff Portal{% endblock %}
+{% block page_title %}Leave Summary{% endblock %}
+
+{% block content %}
+<div style="display: flex; flex-direction: column; gap: 1.5rem;">
+
+    <!-- Top Action Row: Title & Summary Pills -->
+    <div style="display: flex; justify-content: space-between; align-items: flex-end;">
+        <div>
+            <p style="font-size: 0.95rem; color: var(--text-muted); margin: 0; font-weight: 500;">Centralized monitoring of student absence and scheduled returns.</p>
+        </div>
+        <div style="display: flex; gap: 1rem;">
+            <div class="glass-panel" style="padding: 1rem 1.5rem; display: flex; align-items: center; gap: 1rem; border-left: 4px solid var(--danger);">
+                <div style="width: 40px; height: 40px; border-radius: 50%; background: rgba(239, 68, 68, 0.1); color: var(--danger); display: flex; align-items: center; justify-content: center;">
+                    <span class="material-symbols-outlined">luggage</span>
+                </div>
+                <div>
+                    <div style="font-size: 0.85rem; color: var(--text-muted); font-weight: 600; text-transform: uppercase;">Currently Away</div>
+                    <div style="font-size: 1.25rem; font-weight: 700; color: var(--primary);">{{ currently_away_count|default(0) }} Students</div>
+                </div>
+            </div>
+            
+            <div class="glass-panel" style="padding: 1rem 1.5rem; display: flex; align-items: center; gap: 1rem; border-left: 4px solid var(--success);">
+                <div style="width: 40px; height: 40px; border-radius: 50%; background: rgba(34, 197, 94, 0.1); color: var(--success); display: flex; align-items: center; justify-content: center;">
+                    <span class="material-symbols-outlined">home</span>
+                </div>
+                <div>
+                    <div style="font-size: 0.85rem; color: var(--text-muted); font-weight: 600; text-transform: uppercase;">Returns Today</div>
+                    <div style="font-size: 1.25rem; font-weight: 700; color: var(--primary);">{{ returns_today_count|default(0) }} Students</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Filter & Search Toolbar -->
+    <div class="glass-panel" style="padding: 1rem;">
+        <form action="#" method="GET" style="display: flex; gap: 1rem; align-items: center;">
+            <div style="flex: 1; position: relative;">
+                <span class="material-symbols-outlined" style="position: absolute; left: 1rem; top: 50%; transform: translateY(-50%); color: var(--text-muted); font-size: 20px;">search</span>
+                <input type="text" placeholder="Search student name or ID..." class="form-control" style="padding-left: 2.75rem;">
+            </div>
+            <select class="form-control" style="width: auto;">
+                <option value="">All Hostel Blocks</option>
+                <option value="A">Block A</option>
+                <option value="B">Block B</option>
+                <option value="C">Block C</option>
+            </select>
+            <select class="form-control" style="width: auto;">
+                <option value="">All Leave Types</option>
+                <option value="Medical">Medical Leave</option>
+                <option value="Home">Weekend Home Trip</option>
+                <option value="Emergency">Family Emergency</option>
+            </select>
+            <button type="button" class="btn btn-primary" style="display: flex; align-items: center; gap: 0.5rem; padding: 0.5rem 1.25rem;">
+                <span class="material-symbols-outlined" style="font-size: 18px;">filter_list</span> Apply Filters
+            </button>
+        </form>
+    </div>
+
+    <!-- High-Density Student Leave Ledger Table -->
+    <div class="glass-panel" style="overflow-x: auto; padding: 1.5rem;">
+        <table style="width: 100%; border-collapse: collapse; min-width: 800px;">
+            <thead>
+                <tr style="border-bottom: 2px solid rgba(0,0,0,0.1); text-align: left;">
+                    <th style="padding: 1rem; color: var(--text-muted); font-size: 0.85rem; font-weight: 700; text-transform: uppercase;">Student Name & ID</th>
+                    <th style="padding: 1rem; color: var(--text-muted); font-size: 0.85rem; font-weight: 700; text-transform: uppercase;">Block/Room</th>
+                    <th style="padding: 1rem; color: var(--text-muted); font-size: 0.85rem; font-weight: 700; text-transform: uppercase;">Departure Date</th>
+                    <th style="padding: 1rem; color: var(--text-muted); font-size: 0.85rem; font-weight: 700; text-transform: uppercase;">Expected Return</th>
+                    <th style="padding: 1rem; color: var(--text-muted); font-size: 0.85rem; font-weight: 700; text-transform: uppercase;">Leave Reason</th>
+                    <th style="padding: 1rem; color: var(--text-muted); font-size: 0.85rem; font-weight: 700; text-transform: uppercase;">Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for leave, student in pending_leaves + history_leaves %}
+                <tr style="border-bottom: 1px solid rgba(0,0,0,0.05);">
+                    <td style="padding: 1rem;">
+                        <div style="display: flex; align-items: center; gap: 0.75rem;">
+                            <div style="width: 32px; height: 32px; border-radius: 50%; background: var(--primary-light); color: var(--accent); display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 0.8rem;">
+                                {{ student.full_name[:2].upper() }}
+                            </div>
+                            <div>
+                                <div style="font-weight: 700; color: var(--primary);">{{ student.full_name }}</div>
+                                <div style="font-size: 0.75rem; color: var(--text-muted);">#BCWD{{ student.user_id }}</div>
+                            </div>
+                        </div>
+                    </td>
+                    <td style="padding: 1rem; color: var(--primary); font-weight: 500; font-size: 0.9rem;">
+                        {{ student.room.room_number if student.room else 'Unassigned' }}
+                    </td>
+                    <td style="padding: 1rem; font-size: 0.9rem;">{{ leave.from_date.strftime('%d %b %Y') }}</td>
+                    <td style="padding: 1rem; font-size: 0.9rem; font-weight: 600;">{{ leave.to_date.strftime('%d %b %Y') }}</td>
+                    <td style="padding: 1rem;">
+                        <span class="badge" style="background: rgba(0,0,0,0.05); color: var(--text-muted);">{{ leave.leave_type.replace('_', ' ')|title }}</span>
+                        {% if leave.leave_type == 'nursing_duty' %}
+                            <div style="font-size: 0.8rem; margin-top: 4px; color: var(--primary);">{{ leave.shift_type }}</div>
+                            <div style="font-size: 0.8rem; color: var(--text-muted);">Expected: {{ leave.expected_return_time }}</div>
+                        {% endif %}
+                        {% if leave.leave_type == 'college_fest' %}
+                            {% if leave.attachment_path %}
+                                <div style="margin-top: 4px;"><a href="{{ url_for('static', filename='uploads/leaves/' + leave.attachment_path) }}" target="_blank" style="font-size: 0.8rem; color: #3b82f6; text-decoration: underline;">View HOD Letter</a></div>
+                            {% endif %}
+                            {% if leave.ocr_text %}
+                                <div style="font-size: 0.8rem; color: #10b981; margin-top: 2px;">✓ OCR Scanned</div>
+                                {% if leave.ocr_extracted_dates %}
+                                    <div style="font-size: 0.75rem; color: var(--text-muted);">Dates: {{ leave.ocr_extracted_dates }}</div>
+                                {% endif %}
+                                {% if leave.ocr_days %}
+                                    <div style="font-size: 0.75rem; color: var(--text-muted);">Days: {{ leave.ocr_days }}</div>
+                                {% endif %}
+                            {% endif %}
+                        {% endif %}
+                    </td>
+                    <td style="padding: 1rem;">
+                        {% if leave.status == 'Pending' %}
+                            <span class="badge badge-warning">Pending Review</span>
+                        {% elif leave.status == 'Approved' %}
+                            {% if leave.is_returned %}
+                                <span class="badge badge-success">Returned Safely</span>
+                            {% else %}
+                                {% set today_date = None %}
+                                {% set today = namespace(date=None) %}
+                                {% if leave.to_date < leave.to_date.__class__.today() %}
+                                    <span class="badge badge-danger" style="background: rgba(239, 68, 68, 0.1); color: var(--danger); border: 1px solid var(--danger);">Overdue Return</span>
+                                {% else %}
+                                    <span class="badge badge-warning" style="background: rgba(245, 158, 11, 0.1); color: var(--warning); border: 1px solid var(--warning);">Currently Away</span>
+                                {% endif %}
+                            {% endif %}
+                        {% else %}
+                            <span class="badge badge-dark">{{ leave.status }}</span>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% else %}
+                <tr>
+                    <td colspan="6" style="padding: 3rem; text-align: center; color: var(--text-muted);">
+                        No leave requests found in the database.
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,215 @@
+{% extends "student/student_base.html" %}
+{% block title %}Academic Records | BCWD{% endblock %}
+{% block page_title %}Marks Cards{% endblock %}
+
+{% block extra_head %}
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet">
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script>
+    tailwind.config = {
+        darkMode: "class",
+        theme: {
+            extend: {
+                "colors": {
+                    "primary-fixed": "#ffdbd0",
+                    "surface-container": "#f0eded",
+                    "surface-container-high": "#eae8e7",
+                    "primary-container": "#5d4037",
+                    "secondary-container": "#fed7ca",
+                    "secondary": "#75584d",
+                    "surface": "#fbf9f8",
+                    "on-primary": "#ffffff",
+                    "on-primary-container": "#d4ada1",
+                    "surface-container-low": "#f5f3f3",
+                    "error-container": "#ffdad6",
+                    "primary": "#442a22",
+                    "on-error": "#ffffff",
+                    "background": "#fbf9f8",
+                    "outline": "#827470",
+                    "outline-variant": "#d4c3be",
+                    "on-surface": "#1b1c1c",
+                    "on-surface-variant": "#504441",
+                    "on-secondary-container": "#795c51",
+                    "surface-container-lowest": "#ffffff"
+                }
+            }
+        }
+    }
+</script>
+<style>
+    .material-symbols-outlined {font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;}
+    .file-input-hidden { display: none; }
+</style>
+<script>
+    function triggerUpload(sem) {
+        document.getElementById('file-upload-' + sem).click();
+    }
+    function submitUpload(sem) {
+        const fileInput = document.getElementById('file-upload-' + sem);
+        if(fileInput.files.length > 0) {
+            document.getElementById('form-' + sem).submit();
+        }
+    }
+</script>
+{% endblock %}
+
+{% block content %}
+<main class="flex-1 p-6 md:p-8 overflow-x-hidden max-w-6xl mx-auto">
+    
+    <div class="bg-surface rounded-2xl shadow-[0px_4px_24px_rgba(68,42,34,0.06)] border border-outline-variant overflow-hidden">
+        
+        <div class="p-8 md:p-10">
+            <a href="{{ url_for('student.dashboard') }}" class="inline-flex items-center gap-1 text-sm font-medium text-on-surface-variant hover:text-primary mb-6 transition-colors bg-surface-container-low px-3 py-1.5 rounded-lg border border-outline-variant/50 w-fit">
+                <span class="material-symbols-outlined text-[18px]">arrow_back</span>
+                Back to Dashboard
+            </a>
+            <h1 class="text-3xl font-bold text-primary mb-2">Academic Records</h1>
+            <p class="text-sm text-on-surface-variant mb-10 max-w-2xl">Manage and upload your semester-wise marks cards for verification. Ensure all documents are clear and in PDF or JPEG format.</p>
+            
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-10">
+                
+                <!-- Cards Grid (2 columns) -->
+                <div class="lg:col-span-2 grid grid-cols-1 sm:grid-cols-2 gap-6">
+                    
+                    {% set sem_names = ['First', 'Second', 'Third', 'Fourth', 'Fifth', 'Sixth', 'Seventh', 'Eighth'] %}
+                    {% set ns = namespace(found_missing=false) %}
+                    
+                    {% for i in range(1, 9) %}
+                        
+                        <form id="form-{{ i }}" method="POST" action="{{ url_for('student.upload_marks_card', sem=i) }}" enctype="multipart/form-data">
+                            <input type="file" id="file-upload-{{ i }}" name="file" accept=".pdf,.jpg,.jpeg,.png" class="file-input-hidden" onchange="submitUpload({{ i }})">
+                        </form>
+
+                        {% if i in cards %}
+                            {% set card = cards[i] %}
+                            <div class="bg-surface rounded-2xl p-6 border border-outline-variant shadow-sm flex flex-col justify-between h-full">
+                                <div>
+                                    <div class="flex justify-between items-start mb-4">
+                                        <span class="bg-[#e9e1dd] text-primary text-[10px] font-bold px-3 py-1 rounded-full uppercase tracking-wider">SEM 0{{ i }}</span>
+                                        {% if card.status == 'Verified' %}
+                                        <span class="material-symbols-outlined text-green-500 text-[20px] font-bold">check_circle</span>
+                                        {% elif card.status == 'Pending' %}
+                                        <span class="material-symbols-outlined text-yellow-500 text-[20px] font-bold" title="Pending Verification">schedule</span>
+                                        {% elif card.status == 'Rejected' %}
+                                        <span class="material-symbols-outlined text-red-500 text-[20px] font-bold" title="Rejected">error</span>
+                                        {% endif %}
+                                    </div>
+                                    <h3 class="text-lg font-bold text-primary mb-1">{{ sem_names[i-1] }} Semester</h3>
+                                    <p class="text-xs text-on-surface-variant">Uploaded on {{ card.uploaded_at.strftime('%b %d, %Y') }}</p>
+                                    
+                                    {% if card.extracted_cgpa %}
+                                    <div class="mt-2 bg-[rgba(212,175,55,0.1)] text-primary text-xs font-bold px-2 py-1 rounded inline-block">
+                                        CGPA/SGPA: {{ card.extracted_cgpa }}
+                                    </div>
+                                    {% endif %}
+                                    
+                                    {% if card.admin_notes %}
+                                    <p class="text-[10px] mt-2 italic {{ 'text-green-600' if card.status == 'Verified' else 'text-yellow-600' }}">
+                                        <span class="material-symbols-outlined text-[12px] align-middle">smart_toy</span> {{ card.admin_notes }}
+                                    </p>
+                                    {% endif %}
+                                </div>
+                                <div class="flex gap-3 mt-6">
+                                    <a href="{{ url_for('student.view_marks_card', filename=card.file_path) }}" target="_blank" class="flex-1 bg-surface-container-low border border-outline-variant text-primary text-xs font-bold py-2 rounded-lg hover:bg-surface-container flex items-center justify-center gap-1 transition-colors"><span class="material-symbols-outlined text-[14px]">visibility</span> View</a>
+                                    <button type="button" onclick="triggerUpload({{ i }})" class="flex-1 bg-surface-container-low border border-outline-variant text-primary text-xs font-bold py-2 rounded-lg hover:bg-surface-container flex items-center justify-center gap-1 transition-colors"><span class="material-symbols-outlined text-[14px]">upload</span> Update</button>
+                                </div>
+                            </div>
+                        
+                        {% else %}
+                            
+                            {% set max_sem = current_user.student_profile.semester | int %}
+                            {% if i <= max_sem and not ns.found_missing %}
+                                {% set ns.found_missing = true %}
+                                <!-- Next Missing Semester (Action Required) -->
+                                <div class="bg-surface rounded-2xl p-6 border-2 border-dashed border-[#e6b19a] flex flex-col justify-between h-full">
+                                    <div>
+                                        <div class="flex justify-between items-start mb-4">
+                                            <span class="bg-[#ffe5d9] text-[#b84a2d] text-[10px] font-bold px-3 py-1 rounded-full uppercase tracking-wider">SEM 0{{ i }}</span>
+                                            <span class="material-symbols-outlined text-[#e6b19a] text-[20px]">more_horiz</span>
+                                        </div>
+                                        <h3 class="text-lg font-bold text-primary mb-1">{{ sem_names[i-1] }} Semester</h3>
+                                        <p class="text-xs text-on-surface-variant">No file uploaded yet</p>
+                                    </div>
+                                    <button type="button" onclick="triggerUpload({{ i }})" class="w-full bg-primary text-white text-xs font-bold py-3 rounded-lg hover:bg-primary-container mt-6 flex items-center justify-center gap-2 transition-colors shadow-md"><span class="material-symbols-outlined text-[16px]">cloud_upload</span> Upload Marks Card</button>
+                                </div>
+                            
+                            {% else %}
+                                <!-- Locked Semester -->
+                                <div class="bg-surface-container-low/50 rounded-2xl p-6 border border-outline-variant/30 flex flex-col justify-between h-full opacity-60">
+                                    <div>
+                                        <div class="flex justify-between items-start mb-4">
+                                            <span class="bg-surface-container-high text-on-surface-variant text-[10px] font-bold px-3 py-1 rounded-full uppercase tracking-wider">SEM 0{{ i }}</span>
+                                            <span class="material-symbols-outlined text-outline-variant text-[18px]">lock</span>
+                                        </div>
+                                        <h3 class="text-lg font-bold text-on-surface-variant mb-1">{{ sem_names[i-1] }} Semester</h3>
+                                        <p class="text-xs text-outline">Available after Semester exams</p>
+                                    </div>
+                                    <button type="button" disabled class="w-full bg-surface-container-high text-on-surface-variant text-xs font-bold py-2.5 rounded-lg mt-6 flex items-center justify-center gap-2 cursor-not-allowed border border-outline-variant/50"><span class="material-symbols-outlined text-[14px]">block</span> Locked</button>
+                                </div>
+                            {% endif %}
+                            
+                        {% endif %}
+                        
+                    {% endfor %}
+                    
+                </div>
+                
+                <!-- Right Timeline Panel -->
+                <div class="bg-surface rounded-2xl border border-outline-variant p-8 h-fit shadow-sm">
+                    <h3 class="font-bold text-primary text-lg mb-6">Upload Timeline</h3>
+                    
+                    <div class="relative border-l-2 border-surface-container-high ml-3 space-y-6 pb-6">
+                        {% if timeline %}
+                            {% for log in timeline %}
+                                <div class="relative pl-6">
+                                    {% if log.status_type == 'success' %}
+                                        <div class="absolute -left-[9px] top-1 w-4 h-4 rounded-full bg-green-100 border-2 border-green-500 flex items-center justify-center">
+                                            <span class="material-symbols-outlined text-[8px] text-green-700 font-bold">check</span>
+                                        </div>
+                                    {% elif log.status_type == 'warning' %}
+                                        <div class="absolute -left-[9px] top-1 w-4 h-4 rounded-full bg-yellow-100 border-2 border-yellow-500 flex items-center justify-center">
+                                            <span class="material-symbols-outlined text-[8px] text-yellow-700 font-bold">sync</span>
+                                        </div>
+                                    {% elif log.status_type == 'error' %}
+                                        <div class="absolute -left-[9px] top-1 w-4 h-4 rounded-full bg-red-100 border-2 border-red-500 flex items-center justify-center">
+                                            <span class="material-symbols-outlined text-[8px] text-red-700 font-bold">close</span>
+                                        </div>
+                                    {% else %}
+                                        <div class="absolute -left-[9px] top-1 w-4 h-4 rounded-full bg-[#ffe5d9] border-2 border-[#d45d3e] flex items-center justify-center">
+                                            <span class="material-symbols-outlined text-[8px] text-[#b84a2d] font-bold">check</span>
+                                        </div>
+                                    {% endif %}
+                                    <h4 class="text-xs font-bold text-primary mb-0.5">{{ log.title }}</h4>
+                                    <p class="text-[10px] text-on-surface-variant leading-relaxed">{{ log.description }}</p>
+                                    <span class="text-[9px] text-outline mt-1 block">{{ log.created_at.strftime('%b %d, %Y • %I:%M %p') }}</span>
+                                </div>
+                            {% endfor %}
+                        {% else %}
+                            <div class="relative pl-6">
+                                <div class="absolute -left-[9px] top-1 w-4 h-4 rounded-full bg-surface-container-high border-2 border-outline-variant"></div>
+                                <h4 class="text-xs font-bold text-primary mb-0.5">Registration</h4>
+                                <p class="text-[10px] text-on-surface-variant">Profile created. Awaiting uploads.</p>
+                            </div>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="bg-surface-container-low border border-outline-variant/50 rounded-xl p-4 mt-6">
+                        <h4 class="text-[11px] font-bold text-primary flex items-center gap-1.5 mb-2"><span class="material-symbols-outlined text-[14px]">info</span> Storage Note</h4>
+                        <p class="text-[10px] text-on-surface-variant leading-relaxed">Documents are stored securely for 5 academic years as per BCWD guidelines.</p>
+                    </div>
+                </div>
+                
+            </div>
+            
+        </div>
+        
+        <!-- Footer -->
+        <div class="bg-surface-container-low p-6 text-center border-t border-outline-variant">
+            <h4 class="font-bold text-primary text-sm mb-1">BCWD - 1878</h4>
+            <p class="text-[10px] text-on-surface-variant mb-4">ಶ್ರೀ ಬಿ. ಚೌಡರಾಜು ಅವರು, ಹಿಂದುಳಿದ ವರ್ಗಗಳ ಕಲ್ಯಾಣ ಇಲಾಖೆ<br>ವೃತ್ತಿಪರ ಮಹಿಳಾ ವಿದ್ಯಾರ್ಥಿ ನಿಲಯ, ಬಿಜೈ ಪಡೀಲ್</p>
+        </div>
+        
+    </div>
+</main>
+{% endblock %}

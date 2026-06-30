@@ -1,0 +1,149 @@
+{% extends "admin/admin_base.html" %}
+
+{% block title %}Notice Management | BCWD{% endblock %}
+{% block page_title %}Broadcast Notices{% endblock %}
+
+{% block content %}
+<style>
+    .category-btn {
+        transition: all 0.3s ease !important;
+        background: white !important;
+        color: var(--text-muted) !important;
+        border-color: var(--border-color) !important;
+    }
+    .category-btn:hover {
+        background: rgba(212, 175, 55, 0.05) !important;
+        color: var(--primary) !important;
+        border-color: var(--accent) !important;
+    }
+    .category-btn.active {
+        background: rgba(212, 175, 55, 0.1) !important;
+        border-color: var(--accent) !important;
+        color: var(--primary) !important;
+    }
+</style>
+<div style="display: grid; grid-template-columns: 1fr 1.5fr; gap: 2rem;">
+    
+    <!-- Left: Create New Notice Form -->
+    <div>
+        <div class="glass-panel" style="padding: 2rem;">
+            <div style="display: flex; align-items: center; gap: 1rem; margin-bottom: 1.5rem;">
+                <div style="width: 48px; height: 48px; border-radius: 12px; background: var(--primary-light); color: var(--accent); display: flex; align-items: center; justify-content: center;">
+                    <span class="material-symbols-outlined" style="font-size: 28px;">add_comment</span>
+                </div>
+                <h3 style="font-size: 1.5rem; font-weight: 700; color: var(--primary); margin: 0;">Create New Notice</h3>
+            </div>
+            
+            <form method="POST" action="{{ url_for('admin.manage_notices') }}">
+                <!-- Category Selector -->
+                <div style="margin-bottom: 1.5rem;">
+                    <label style="display: block; font-size: 0.85rem; font-weight: 700; color: var(--text-muted); margin-bottom: 0.5rem; text-transform: uppercase;">Category</label>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem;" id="category-buttons">
+                        <button type="button" class="btn-outline category-btn active" style="justify-content: center;">
+                            <span class="material-symbols-outlined" style="font-size: 20px;">info</span> General
+                        </button>
+                        <button type="button" class="btn-outline category-btn" style="justify-content: center;">
+                            <span class="material-symbols-outlined" style="font-size: 20px;">home</span> Hostel
+                        </button>
+                        <button type="button" class="btn-outline category-btn" style="justify-content: center;">
+                            <span class="material-symbols-outlined" style="font-size: 20px;">beach_access</span> Holiday
+                        </button>
+                        <button type="button" class="btn-outline category-btn" style="justify-content: center;">
+                            <span class="material-symbols-outlined" style="font-size: 20px;">restaurant</span> Food
+                        </button>
+                        <input type="hidden" name="category" id="selected-category" value="General">
+                    </div>
+                </div>
+
+                <!-- Audience, Subject, Message -->
+                <div style="margin-bottom: 1.5rem;">
+                    <label style="display: block; font-size: 0.85rem; font-weight: 700; color: var(--text-muted); margin-bottom: 0.5rem; text-transform: uppercase;">Audience</label>
+                    <select name="audience" class="form-control" style="background: rgba(0,0,0,0.02);">
+                        <option value="All Students">All Students</option>
+                        <option value="All Staff">All Staff</option>
+                        <option value="Both">Both (Students & Staff)</option>
+                    </select>
+                </div>
+                
+                <div style="margin-bottom: 1.5rem;">
+                    <label style="display: block; font-size: 0.85rem; font-weight: 700; color: var(--text-muted); margin-bottom: 0.5rem; text-transform: uppercase;">Subject</label>
+                    <input type="text" name="title" class="form-control" style="background: rgba(0,0,0,0.02);" placeholder="Enter notice title" required/>
+                </div>
+
+                <div style="margin-bottom: 2rem;">
+                    <label style="display: block; font-size: 0.85rem; font-weight: 700; color: var(--text-muted); margin-bottom: 0.5rem; text-transform: uppercase;">Message</label>
+                    <textarea name="description" class="form-control" style="background: rgba(0,0,0,0.02); min-height: 120px; resize: vertical;" placeholder="Draft your announcement..."></textarea>
+                </div>
+
+                <button type="submit" class="btn-premium" style="width: 100%; justify-content: center;">
+                    Send Notification <span class="material-symbols-outlined" style="font-size: 20px;">send</span>
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Right: Stats & Sent History -->
+    <div style="display: flex; flex-direction: column; gap: 2rem;">
+        <!-- Stats Grid -->
+        <div class="grid-cols-3">
+            <div class="glass-panel" style="padding: 1.5rem; border-left: 4px solid var(--primary);">
+                <p style="font-size: 0.75rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase;">Total Sent</p>
+                <p style="font-size: 2rem; font-weight: 700; color: var(--primary); margin-top: 0.5rem;">{{ total_sent }}</p>
+            </div>
+            <div class="glass-panel" style="padding: 1.5rem; border-left: 4px solid var(--info);">
+                <p style="font-size: 0.75rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase;">Avg Reach</p>
+                <p style="font-size: 2rem; font-weight: 700; color: var(--info); margin-top: 0.5rem;">{{ avg_reach }}</p>
+            </div>
+            <div class="glass-panel" style="padding: 1.5rem; border-left: 4px solid var(--success);">
+                <p style="font-size: 0.75rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase;">Scheduled</p>
+                <p style="font-size: 2rem; font-weight: 700; color: var(--success); margin-top: 0.5rem;">{{ scheduled }}</p>
+            </div>
+        </div>
+
+        <!-- Sent History List -->
+        <div class="glass-panel" style="padding: 0; display: flex; flex-direction: column; flex: 1;">
+            <div style="padding: 1.5rem; border-bottom: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center; background: rgba(0,0,0,0.02);">
+                <h3 style="font-size: 1.25rem; font-weight: 700; color: var(--primary); margin: 0;">Sent History</h3>
+                <a href="#" style="font-size: 0.85rem; font-weight: 700; color: var(--primary);">View Full Report</a>
+            </div>
+            
+            <div style="display: flex; flex-direction: column; overflow-y: auto; max-height: 400px; padding: 1rem;">
+                {% for notice in notices %}
+                <div style="padding: 1rem; border-bottom: 1px solid rgba(0,0,0,0.05); display: flex; flex-direction: column; gap: 0.5rem;">
+                    <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+                        <h4 style="margin: 0; font-size: 1rem; font-weight: 700; color: var(--primary);">{{ notice.title }}</h4>
+                        <span class="badge" style="background: rgba(0,0,0,0.05); color: var(--text-muted);">{{ notice.category }}</span>
+                    </div>
+                    <p style="margin: 0; font-size: 0.9rem; color: var(--text-muted);">{{ notice.description }}</p>
+                    <span style="font-size: 0.75rem; color: var(--text-muted); opacity: 0.8;">Sent: {{ notice.created_at.strftime('%d %b %Y, %I:%M %p') }}</span>
+                </div>
+                {% else %}
+                <div style="text-align: center; padding: 2rem;">
+                    <span class="material-symbols-outlined" style="font-size: 48px; color: var(--text-muted); opacity: 0.5; margin-bottom: 1rem;">notifications_off</span>
+                    <p style="font-size: 1rem; font-weight: 600; color: var(--text-muted);">No notices sent yet</p>
+                    <p style="font-size: 0.85rem; color: var(--text-muted); opacity: 0.8;">Your fresh sent notifications will appear here.</p>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const buttons = document.querySelectorAll('.category-btn');
+        const hiddenInput = document.getElementById('selected-category');
+        
+        buttons.forEach(button => {
+            button.addEventListener('click', function() {
+                buttons.forEach(btn => btn.classList.remove('active'));
+                this.classList.add('active');
+                hiddenInput.value = this.textContent.trim();
+            });
+        });
+    });
+</script>
+{% endblock %}

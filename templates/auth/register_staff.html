@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Staff Registration - BCWD Portal</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/theme.css') }}">
+</head>
+<body class="ag-body-gradient">
+    <!-- Top Brand Header Navigation Layout -->
+    <header class="ag-auth-header">
+        <div class="ag-header-left">
+            <span class="ag-icon-home">🏢</span> <strong>BCWD Staff Portal</strong>
+        </div>
+        <div class="ag-header-right">
+            <div class="ag-user-avatar-placeholder"></div>
+        </div>
+    </header>
+
+    <!-- Split Screen Wizard Container Layout -->
+    <div class="ag-wizard-layout-container">
+        
+        <!-- Left Column: Wizard Stepper Index & Dynamic Notice -->
+        <aside class="ag-wizard-sidebar">
+            <div class="ag-wizard-step-vertical">
+                <div class="ag-step-node active">
+                    <span class="ag-step-number">1</span>
+                    <div class="ag-step-text">
+                        <strong>Personal Details</strong>
+                        <span>Provide basic identification</span>
+                    </div>
+                </div>
+                <div class="ag-step-node">
+                    <span class="ag-step-number">2</span>
+                    <div class="ag-step-text">
+                        <strong>Documents</strong>
+                        <span>Upload identity records</span>
+                    </div>
+                </div>
+                <div class="ag-step-node">
+                    <span class="ag-step-number">3</span>
+                    <div class="ag-step-text">
+                        <strong>Account Setup</strong>
+                        <span>Finalize secure access</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Left Dynamic Alert Box based on visual layout -->
+            <div class="ag-wizard-alert-box">
+                <span class="ag-wizard-alert-icon">ℹ️</span>
+                <p>Registration will become active only after Warden approval.</p>
+            </div>
+        </aside>
+
+        <!-- Right Column: Interactive Anti-Gravity Document Form -->
+        <main class="ag-wizard-form-panel">
+            <div class="ag-card ag-card-elevated ag-glass-panel p-5">
+                <div class="ag-form-section-header">
+                    <h2>Personal Details</h2>
+                    <p>Provide your basic identification and contact information.</p>
+                </div>
+                <hr class="ag-divider">
+
+                <form action="{{ url_for('auth.register_staff') }}" method="POST" enctype="multipart/form-data" class="ag-form-stack">
+                    
+                    <!-- Line 1: Full Name and Mobile Number Grid -->
+                    <div class="ag-form-row">
+                        <div class="ag-form-group">
+                            <label for="name">Full Name (As per Aadhaar)</label>
+                            <input type="text" id="name" name="name" required placeholder="Enter your full name" class="ag-form-input">
+                        </div>
+                        <div class="ag-form-group">
+                            <label for="phone">Mobile Number</label>
+                            <input type="text" id="phone" name="phone" required pattern="[0-9]{10}" placeholder="+91 XXXXX XXXXX" class="ag-form-input">
+                        </div>
+                    </div>
+
+                    <!-- Line 2: Residential Address Block -->
+                    <div class="ag-form-group">
+                        <label for="address">Residential Address</label>
+                        <textarea id="address" name="address" required placeholder="Enter complete address" class="ag-form-input" rows="3"></textarea>
+                    </div>
+
+                    <!-- Line 3: Aadhaar and Ration Card Identifiers Grid -->
+                    <div class="ag-form-row">
+                        <div class="ag-form-group">
+                            <label for="aadhar_card">Aadhaar Number</label>
+                            <input type="text" id="aadhar_card" name="aadhar_card" required pattern="[0-9]{12}" placeholder="XXXX XXXX XXXX" class="ag-form-input">
+                        </div>
+                        <div class="ag-form-group">
+                            <label for="ration_card">Ration Card Number</label>
+                            <input type="text" id="ration_card" name="ration_card" required placeholder="Enter Ration ID" class="ag-form-input">
+                        </div>
+                    </div>
+
+                    <!-- Line 4: Marital Status Custom Choice Pickers (Inline Radios) -->
+                    <div class="ag-form-group">
+                        <label>Marital Status</label>
+                        <div class="ag-radio-group">
+                            <label class="ag-radio-label">
+                                <input type="radio" name="marital_status" value="Unmarried" checked>
+                                <span class="ag-custom-radio"></span> Unmarried
+                            </label>
+                            <label class="ag-radio-label">
+                                <input type="radio" name="marital_status" value="Married">
+                                <span class="ag-custom-radio"></span> Married
+                            </label>
+                            <label class="ag-radio-label">
+                                <input type="radio" name="marital_status" value="Widow">
+                                <span class="ag-custom-radio"></span> Widow
+                            </label>
+                        </div>
+                    </div>
+
+                    <!-- Document Uploads Multi-Card Grid Component -->
+                    <div class="ag-form-section-header mt-4">
+                        <h3>Document Uploads</h3>
+                        <p>Upload scanned copies of required documents. Formats: PDF, JPG (Max 2MB)</p>
+                    </div>
+                    <div class="ag-upload-card-grid">
+                        <!-- Card 1: Passport Size Photo -->
+                        <div class="ag-upload-dropzone">
+                            <div class="ag-dropzone-icon-container">📸</div>
+                            <strong>Staff Photo</strong>
+                            <span>Recent passport size</span>
+                            <input type="file" name="passport_photo" required class="ag-hidden-file-input" accept="image/*">
+                        </div>
+
+                        <!-- Card 2: Aadhaar Card PDF/Image -->
+                        <div class="ag-upload-dropzone">
+                            <div class="ag-dropzone-icon-container">🪪</div>
+                            <strong>Aadhaar Card</strong>
+                            <span>Front & back views</span>
+                            <input type="file" name="aadhar_doc" required class="ag-hidden-file-input" accept="image/*,application/pdf">
+                        </div>
+
+                        <!-- Card 3: Ration Card Document -->
+                        <div class="ag-upload-dropzone">
+                            <div class="ag-dropzone-icon-container">📋</div>
+                            <strong>Ration Card</strong>
+                            <span>Primary details page</span>
+                            <input type="file" name="ration_doc" required class="ag-hidden-file-input" accept="image/*,application/pdf">
+                        </div>
+                    </div>
+
+                    <!-- Form Action Trigger Elements Section -->
+                    <div class="ag-wizard-actions-footer">
+                        <div class="ag-terms-consent-wrapper">
+                            <input type="checkbox" id="terms" required class="ag-custom-checkbox">
+                            <label for="terms">I agree to the <a href="#" class="ag-link-inline">Terms of Service</a></label>
+                        </div>
+                        <div class="ag-btn-action-cluster">
+                            <button type="button" class="ag-btn-neutral ag-hover-interactive">Leave Draft</button>
+                            <button type="submit" class="ag-btn-primary ag-hover-interactive">Complete Registration</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </main>
+    </div>
+</body>
+</html>

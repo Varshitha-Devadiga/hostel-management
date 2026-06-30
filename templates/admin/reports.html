@@ -1,0 +1,250 @@
+{% extends "admin/admin_base.html" %}
+
+{% block title %}Reports & Analytics | BCWD{% endblock %}
+{% block page_title %}Reports & Analytics{% endblock %}
+
+{% block content %}
+<div id="pdf-wrapper">
+<!-- Download Quarterly Reports Section -->
+<div style="background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%); color: white; padding: 2rem; border-radius: 16px; margin-bottom: 2rem; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1.5rem; box-shadow: var(--shadow-lg);">
+    <div style="display: flex; align-items: center; gap: 1.5rem;">
+        <div style="width: 64px; height: 64px; background: rgba(255,255,255,0.1); border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+            <span class="material-symbols-outlined" style="font-size: 32px; color: var(--accent);">summarize</span>
+        </div>
+        <div>
+            <h3 style="font-size: 1.5rem; font-weight: 700; margin-bottom: 0.25rem;">Quarterly Performance & Operational Report</h3>
+            <p style="font-size: 0.95rem; opacity: 0.8; margin: 0;">Generated metrics for Q2 2026. Includes attendance, complaints, and resource utilization.</p>
+        </div>
+    </div>
+    <button id="pdf-btn" onclick="downloadPDF()" data-html2canvas-ignore="true" style="background: white; color: var(--primary); border: none; padding: 0.75rem 1.5rem; border-radius: 8px; font-weight: 700; font-size: 1rem; display: flex; align-items: center; gap: 0.5rem; cursor: pointer; transition: var(--transition);" onmouseover="this.style.transform='translateY(-2px)'" onmouseout="this.style.transform='translateY(0)'">
+        <span class="material-symbols-outlined">download</span> Download PDF
+    </button>
+</div>
+
+<!-- Charts Section -->
+<div style="display: grid; grid-template-columns: 2fr 1fr; gap: 2rem; margin-bottom: 2rem;">
+    <!-- Course-wise Distribution Chart -->
+    <div class="glass-panel" style="padding: 2rem;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+            <h3 style="font-size: 1.25rem; font-weight: 700; color: var(--primary); display: flex; align-items: center; gap: 0.5rem;">
+                <span class="material-symbols-outlined">bar_chart</span> Course-wise Distribution
+            </h3>
+            <select class="form-control" style="width: auto; padding: 0.25rem 0.5rem; font-size: 0.85rem; background: rgba(0,0,0,0.02);">
+                <option>This Semester</option>
+                <option>Last Semester</option>
+            </select>
+        </div>
+        <div style="height: 300px; width: 100%;">
+            <canvas id="courseChartAg"></canvas>
+        </div>
+    </div>
+
+    <!-- Food Preference Chart -->
+    <div class="glass-panel" style="padding: 2rem; display: flex; flex-direction: column;">
+        <h3 style="font-size: 1.25rem; font-weight: 700; color: var(--primary); margin-bottom: 1.5rem; display: flex; align-items: center; gap: 0.5rem;">
+            <span class="material-symbols-outlined">pie_chart</span> Food Preference
+        </h3>
+        <div style="flex: 1; min-height: 250px; display: flex; align-items: center; justify-content: center;">
+            <canvas id="dietChartAg"></canvas>
+        </div>
+    </div>
+</div>
+
+<!-- Data Table Section -->
+<div class="glass-panel" style="padding: 0; overflow: hidden;">
+    <div style="background: var(--primary); color: white; padding: 1.5rem; display: flex; justify-content: space-between; align-items: center;">
+        <h3 style="font-size: 1.25rem; font-weight: 700; margin: 0; display: flex; align-items: center; gap: 0.5rem;">
+            <span class="material-symbols-outlined">assignment_turned_in</span> Complaint Resolution Status
+        </h3>
+        <a href="{{ url_for('admin.export_reports') }}" style="background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); color: white; padding: 0.5rem 1rem; border-radius: 6px; font-weight: 600; font-size: 0.85rem; display: flex; align-items: center; gap: 0.5rem; cursor: pointer; transition: var(--transition); text-decoration: none;" onmouseover="this.style.background='rgba(255,255,255,0.2)'" onmouseout="this.style.background='rgba(255,255,255,0.1)'">
+            <span class="material-symbols-outlined" style="font-size: 18px;">table_chart</span> Export Master Report
+        </a>
+    </div>
+    
+    <div style="overflow-x: auto;">
+        <table class="premium-table">
+            <thead>
+                <tr>
+                    <th>Category</th>
+                    <th>Reported</th>
+                    <th>Resolved</th>
+                    <th>Avg Time (Hrs)</th>
+                    <th>Resolution Rate</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for category, data in complaint_stats.items() %}
+                <tr>
+                    <td style="font-weight: 700; color: var(--primary); display: flex; align-items: center; gap: 0.5rem;">
+                        {% set dot_color = 'var(--success)' if loop.index0 % 4 == 0 else ('var(--info)' if loop.index0 % 4 == 1 else ('var(--warning)' if loop.index0 % 4 == 2 else 'var(--danger)')) %}
+                        <span class="dynamic-dot" data-bg="{{ dot_color }}" style="width: 8px; height: 8px; border-radius: 50%;"></span> {{ category }}
+                    </td>
+                    <td>{{ data.total }}</td>
+                    <td>{{ data.resolved }}</td>
+                    <td>24.0</td>
+                    <td>
+                        <div style="display: flex; align-items: center; gap: 0.75rem;">
+                            <div style="flex: 1; height: 8px; background: rgba(0,0,0,0.05); border-radius: 4px; overflow: hidden;">
+                                {% set bg_color = 'var(--success)' if data.rate >= 80 else ('var(--warning)' if data.rate >= 50 else 'var(--danger)') %}
+                                <div class="dynamic-bar" data-width="{{ data.rate }}" data-bg="{{ bg_color }}" style="height: 100%; border-radius: 4px;"></div>
+                            </div>
+                            <span class="dynamic-text" data-color="{{ bg_color }}" style="font-size: 0.85rem; font-weight: 700; width: 35px;">{{ data.rate }}%</span>
+                        </div>
+                    </td>
+                </tr>
+                {% else %}
+                <tr>
+                    <td colspan="5" style="text-align: center; color: var(--text-muted); padding: 2rem;">No complaint data available yet.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- Student Data Export Section -->
+<div class="glass-panel" style="padding: 0; overflow: hidden; margin-top: 2rem;">
+    <div style="background: var(--primary-light); color: white; padding: 1.5rem; display: flex; justify-content: space-between; align-items: center;">
+        <div>
+            <h3 style="font-size: 1.25rem; font-weight: 700; margin: 0; display: flex; align-items: center; gap: 0.5rem;">
+                <span class="material-symbols-outlined">group</span> Student Master Database
+            </h3>
+            <p style="font-size: 0.85rem; opacity: 0.8; margin: 0; margin-top: 0.25rem;">Export all registration details including personal info, course, and contact details.</p>
+        </div>
+        <a href="{{ url_for('admin.export_students') }}" style="background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); color: white; padding: 0.75rem 1.5rem; border-radius: 6px; font-weight: 600; font-size: 0.95rem; display: flex; align-items: center; gap: 0.5rem; cursor: pointer; transition: var(--transition); text-decoration: none;" onmouseover="this.style.background='rgba(255,255,255,0.2)'" onmouseout="this.style.background='rgba(255,255,255,0.1)'">
+            <span class="material-symbols-outlined" style="font-size: 20px;">download</span> Export Student Details
+        </a>
+    </div>
+</div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+<script>
+    document.querySelectorAll('.dynamic-dot').forEach(el => {
+        el.style.background = el.getAttribute('data-bg');
+    });
+    document.querySelectorAll('.dynamic-bar').forEach(el => {
+        el.style.width = el.getAttribute('data-width') + '%';
+        el.style.background = el.getAttribute('data-bg');
+    });
+    document.querySelectorAll('.dynamic-text').forEach(el => {
+        el.style.color = el.getAttribute('data-color');
+    });
+
+    function downloadPDF() {
+        const element = document.getElementById('pdf-wrapper');
+        const opt = {
+          margin:       0.3,
+          filename:     'BCWD_Quarterly_Report.pdf',
+          image:        { type: 'jpeg', quality: 0.98 },
+          html2canvas:  { scale: 2, useCORS: true },
+          jsPDF:        { unit: 'in', format: 'letter', orientation: 'landscape' }
+        };
+        
+        // Hide the button completely so it doesn't appear in the PDF
+        const btn = document.getElementById('pdf-btn');
+        btn.style.display = 'none';
+        
+        html2pdf().set(opt).from(element).save().then(() => {
+            // Restore the button after saving
+            btn.style.display = 'flex';
+        });
+    }
+
+    // Theme colors mapped for Chart.js
+    const colors = {
+        primary: '#2C1A14',
+        primaryMedium: 'rgba(44, 26, 20, 0.7)',
+        primaryLight: 'rgba(44, 26, 20, 0.4)',
+        primaryLighter: 'rgba(44, 26, 20, 0.2)',
+        primaryLightest: 'rgba(44, 26, 20, 0.1)',
+        secondary: '#52382F',
+        tertiary: '#D4AF37',
+        surfaceHigh: 'rgba(0,0,0,0.1)',
+    };
+
+    // Course-wise Distribution Chart
+    const ctxCourse = document.getElementById('courseChartAg').getContext('2d');
+    new Chart(ctxCourse, {
+        type: 'bar',
+        data: {
+            labels: {{ course_labels|tojson|safe }},
+            datasets: [{
+                label: 'Enrolled Students',
+                data: {{ course_data|tojson|safe }},
+                backgroundColor: [
+                    colors.primary, 
+                    colors.primaryMedium, 
+                    colors.primaryLight, 
+                    colors.primaryLighter, 
+                    colors.primaryLightest,
+                    colors.primaryLightest
+                ],
+                borderRadius: 6,
+                borderSkipped: false
+            }]
+        },
+        options: {
+            animation: false,
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: { display: false },
+                tooltip: {
+                    backgroundColor: colors.primary,
+                    padding: 12,
+                    titleFont: { family: 'Outfit', size: 14 },
+                    bodyFont: { family: 'Outfit', size: 13 }
+                }
+            },
+            scales: {
+                y: { beginAtZero: true, grid: { color: colors.surfaceHigh, drawBorder: false }, border: { dash: [4, 4] } },
+                x: { grid: { display: false }, ticks: { font: { family: 'Outfit' } } }
+            },
+            interaction: {
+                mode: 'index',
+                intersect: false,
+            }
+        }
+    });
+
+    // Food Preference Chart (Doughnut)
+    const ctxDiet = document.getElementById('dietChartAg').getContext('2d');
+    new Chart(ctxDiet, {
+        type: 'doughnut',
+        data: {
+            labels: {{ diet_labels|tojson|safe }},
+            datasets: [{
+                data: {{ diet_data|tojson|safe }},
+                backgroundColor: [colors.secondary, colors.primary, colors.tertiary],
+                borderWidth: 2,
+                borderColor: '#ffffff',
+                cutout: '75%'
+            }]
+        },
+        options: {
+            animation: false,
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: { 
+                    position: 'bottom', 
+                    labels: { 
+                        usePointStyle: true, 
+                        padding: 20,
+                        font: { family: 'Outfit' }
+                    } 
+                },
+                tooltip: {
+                    backgroundColor: colors.primary,
+                    padding: 12,
+                    bodyFont: { family: 'Outfit', size: 13 }
+                }
+            },
+            hover: { mode: 'index' }
+        }
+    });
+</script>
+{% endblock %}
